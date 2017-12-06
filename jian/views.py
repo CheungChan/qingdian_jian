@@ -3,7 +3,7 @@ from jian import models
 from qingdian_jian.utils import get_mongo_collection
 from datetime import datetime
 
-COLLECTION_NAME = 'jian_track'
+COLLECTION_NAME = 'jian_track_test'
 
 
 def track(request):
