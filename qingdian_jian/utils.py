@@ -4,7 +4,7 @@ import pymongo
 
 from qingdian_jian import settings
 
-pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 r = None
 
 
