@@ -2,8 +2,12 @@ from django.http import JsonResponse
 from jian import models
 from qingdian_jian.utils import get_mongo_collection
 from datetime import datetime
+from qingdian_jian.settings import DEBUG
 
-COLLECTION_NAME = 'jian_track_test'
+if DEBUG:
+    COLLECTION_NAME = 'jian_track_test'
+else:
+    COLLECTION_NAME = 'jian_track'
 
 
 def track(request):
