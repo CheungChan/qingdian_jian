@@ -115,19 +115,17 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # 用户设置
 STATIC_URL = '/static/'
 if DEBUG:
     REDIS_HOST = '10.10.6.5'
     REDIS_PORT = 6012
+    MONGO_HOST = '10.10.6.3'
 else:
     REDIS_HOST = '10.10.10.3'
     REDIS_PORT = 6000
+    MONGO_HOST = '10.10.10.2'
 REDIS_DB = 15
-# MONGO地址
-# MONGO_HOST = '10.10.6.3'
-MONGO_HOST = '10.10.10.2'
 # MONGO_PORT = 27017
 MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
