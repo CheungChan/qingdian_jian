@@ -32,3 +32,9 @@ class ContentsTag(models.Model):
     class Meta:
         managed = False
         db_table = 'contents_tag'
+
+    @classmethod
+    def get_tags_by_content_pk(cls, cid):
+        tags = cls.objects.filter(content__pk=cid).values('tag_id')
+        tags = [t['tag_id'] for t in tags]
+        return tags
