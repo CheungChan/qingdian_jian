@@ -9,7 +9,7 @@ if DEBUG:
     TRACK_DISS_COLLECTION_NAME = 'jian_track_diss_test'
 else:
     TRACK_COLLECTION_NAME = 'jian_track'
-    TRACK_DISS_COLLECTION_NAME = 'jian_track_diss_test'
+    TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 
 
 def track(request):
