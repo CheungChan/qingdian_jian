@@ -1,13 +1,10 @@
+from datetime import datetime
+
 from django.http import JsonResponse
+
 from jian import models
 from qingdian_jian.utils import get_mongo_collection
-from datetime import datetime
-from qingdian_jian.settings import DEBUG
 
-# if DEBUG:
-#     TRACK_COLLECTION_NAME = 'jian_track_test'
-#     TRACK_DISS_COLLECTION_NAME = 'jian_track_diss_test'
-# else:
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 
