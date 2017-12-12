@@ -23,7 +23,12 @@ SECRET_KEY = '7a66qzbk+vowjz0^(@$n=rbvjy8h84yv-56ku4hz6r6$gwb@#d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
+profile_file = os.path.join(os.path.expanduser('~'), 'profile')
+if os.path.exists(profile_file):
+    with open(profile_file) as f:
+        if f.read().strip() == 'dev':
+            DEBUG = True
+print(f'DEBUG={DEBUG}')
 ALLOWED_HOSTS = ['*']
 
 # Application definition
