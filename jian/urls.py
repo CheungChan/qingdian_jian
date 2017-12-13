@@ -1,12 +1,12 @@
 from django.urls import path
-from jian import views
+from jian.views import diss, track, tuijian
 
 urlpatterns = [
-    path('track', views.track),
-    path('track/diss', views.track_diss),
-    path('diss/list', views.diss_list),
-    path('uids_by_uid', views.uids_by_uid),
-    path('cids_by_uid', views.cids_by_uid),
-    path('uids_by_cid', views.uids_by_cid),
-    path('cids_by_cid', views.cids_by_cid),
+    path('track', track.track),
+    path('track/diss', diss.track_diss),
+    path('diss/list', diss.diss_list),
+    path('uids_by_uid', tuijian.uids_by_uid),
+    path('cids_by_uid', tuijian.cids_by_uid),
+    path('uids_by_cid', tuijian.uids_by_cid),
+    path('cids_by_cid', tuijian.cids_by_cid),
 ]

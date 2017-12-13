@@ -31,6 +31,17 @@ def get_mongo_collection(collection_name):
     return database[collection_name]
 
 
+def trans_int(*param, error_return=None):
+    int_param = []
+    for p in param:
+        try:
+            p = int(p)
+            int_param.append(p)
+        except (ValueError, TypeError):
+            return error_return
+    return int_param
+
+
 if __name__ == '__main__':
     r = get_redis()
     # r.set('test_chenzhang','测试',10)

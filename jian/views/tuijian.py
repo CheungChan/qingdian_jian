@@ -1,80 +1,33 @@
 import logging
 from collections import Counter
-from datetime import datetime
 from random import shuffle
+
 from django.http import JsonResponse
 
 from jian import models
-from qingdian_jian.utils import get_mongo_collection
+from qingdian_jian.utils import get_mongo_collection, trans_int
 
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 logger = logging.getLogger(__name__)
 
 
-def track(request):
-    uid = request.GET.get('uid')
-    cid = request.GET.get('cid')
-    try:
-        uid = int(uid)
-        cid = int(cid)
-    except ValueError:
-        j = {'status': -1, 'msg': 'param error'}
-        return JsonResponse(j, safe=True)
-    tags = models.ContentsTag.get_tids_by_cid(cid)
-    db = get_mongo_collection(TRACK_COLLECTION_NAME)
-    data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now()}
-    db.insert_one(data)
-    logger.info(f'track data={data}')
-    j = {'status': 0, 'msg': 'ok'}
-    return JsonResponse(j, safe=False)
-
-
-def track_diss(request):
-    uid = request.GET.get('uid')
-    cid = request.GET.get('cid')
-    try:
-        uid = int(uid)
-        cid = int(cid)
-    except ValueError:
-        j = {'status': -1, 'msg': 'param error'}
-        return JsonResponse(j, safe=True)
-    tags = models.ContentsTag.get_tids_by_cid(cid)
-    db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
-    data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now()}
-    db.insert_one(data)
-    logger.info(f'track_diss data={data}')
-    j = {'status': 0, 'msg': 'ok'}
-    return JsonResponse(j, safe=False)
-
-
-def diss_list(request):
-    uid = request.GET.get('uid')
-    try:
-        uid = int(uid)
-    except ValueError:
-        j = {'status': -1, 'msg': 'param error'}
-        return JsonResponse(j, safe=True)
-    db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
-    records = []
-    for r in db.find({'uid': uid}):
-        records.append(r['cid'])
-    records = list(set(records))
-    j = {'status': 0, 'data': records}
-    logger.info(f'diss_list j={j}')
-    return JsonResponse(j, safe=False)
-
-
 def uids_by_uid(request):
+    uid = trans_int(request.GET.get('uid'))
+    if uid is None:
+        j = {'status': -1, 'data': []}
+    else:
+        j = {'status': 0, 'data': []}
+    return JsonResponse(j, safe=False)
+
+
+def cids_by_uid(request):
     uid = request.GET.get('uid')
     n = request.GET.get('n', 20)
-    try:
-        uid = int(uid)
-        n = int(n)
-    except ValueError:
-        j = {'status': -1, 'msg': 'param error'}
-        return JsonResponse(j, safe=True)
-
+    uid, n = trans_int(uid, n)
+    if uid is None or n is None:
+        j = {'status': -1, 'data': []}
+        return JsonResponse(j, safe=False)
     # 找到此用户的浏览记录
     db = get_mongo_collection(TRACK_COLLECTION_NAME)
     tracked = []
@@ -85,10 +38,6 @@ def uids_by_uid(request):
     if len_tracked == 0:
         jian_cids = []
     else:
-
-        # 所有此用户浏览过的cid
-        tracked_cids = list(set([t['cid'] for t in tracked]))
-        # 如 [166, 105, 234, 187, 188]
 
         # 所有浏览记录里面的tid和要出现几个cid
         tracked_tids = []
@@ -130,16 +79,10 @@ def uids_by_uid(request):
     len_lack = n - len_jian
     if len_lack > 0:
         jian_cids += models.ContentsTag.get_limit_cids(None, None, len_lack)
-        logger.info(f'不够，从新鲜中获取{len_lack}个')
+        logger.info(f'不够，从最新中获取{len_lack}个')
     shuffle(jian_cids)
     j = {'status': 0, 'data': jian_cids}
     logger.info(f'jian j= {j}')
-    return JsonResponse(j, safe=False)
-
-
-def cids_by_uid(request):
-    uid = request.GET.get('uid')
-    j = {'status': 0, 'data': []}
     return JsonResponse(j, safe=False)
 
 
