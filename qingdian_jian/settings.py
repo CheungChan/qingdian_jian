@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'qingdian_jian.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
+test_db = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'qdbuluo',
@@ -88,6 +88,21 @@ DATABASES = {
     }
 
 }
+prod_db = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'qdbuluo',
+        'HOST': '10.10.10.2',
+        'PORT': 2000,
+        'USER': 'qd',
+        'PASSWORD': '123^%$-qwe-asd',
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
+if DEBUG:
+    DATABASES = test_db
+else:
+    DATABASES = prod_db
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
