@@ -1,7 +1,7 @@
 import logging
 from collections import Counter
 from datetime import datetime
-
+from random import shuffle
 from django.http import JsonResponse
 
 from jian import models
@@ -131,6 +131,7 @@ def uids_by_uid(request):
     if len_lack > 0:
         jian_cids += models.ContentsTag.get_limit_cids(None, None, len_lack)
         logger.info(f'不够，从新鲜中获取{len_lack}个')
+    shuffle(jian_cids)
     j = {'status': 0, 'data': jian_cids}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
