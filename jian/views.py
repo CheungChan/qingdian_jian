@@ -49,6 +49,25 @@ def track_diss(request):
     return JsonResponse(j, safe=False)
 
 
+def diss_list(request):
+    uid = request.GET.get('uid')
+    if not uid:
+        j = {'status': -1, 'msg': 'param error'}
+        return JsonResponse(j, safe=False)
+    try:
+        uid = int(uid)
+    except ValueError:
+        j = {'status': -2, 'msg': 'param type error'}
+        return JsonResponse(j, safe=True)
+    db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
+    records = []
+    for r in db.find({'uid': uid}):
+        records.append(r['cid'])
+    records = list(set(records))
+    j = {'status': 0, 'data': records}
+    return JsonResponse(j, safe=False)
+
+
 def uids_by_uid(request):
     uid = request.GET.get('uid')
     j = {'status': 0, 'data': []}
