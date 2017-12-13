@@ -1,29 +1,8 @@
 from django.db import models
 
 
-class Contents(models.Model):
-    theme_id = models.IntegerField()
-    thirdparty_id = models.CharField(max_length=150, blank=True, null=True)
-    publish_time = models.DateTimeField(blank=True, null=True)
-    title = models.TextField()
-    desp = models.TextField()
-    contents_refter_type = models.IntegerField()
-    media_type = models.IntegerField()
-    pic_link = models.CharField(max_length=240)
-    likes_count = models.IntegerField()
-    comment_count = models.IntegerField()
-    status = models.IntegerField()
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
-    mongo_id = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'contents'
-
-
 class ContentsTag(models.Model):
-    content = models.ForeignKey(Contents, models.DO_NOTHING)
+    content_id = models.IntegerField()
     tag_id = models.IntegerField()
     name = models.CharField(max_length=10)
     created_at = models.DateTimeField()
@@ -34,7 +13,18 @@ class ContentsTag(models.Model):
         db_table = 'contents_tag'
 
     @classmethod
-    def get_tags_by_content_pk(cls, cid):
-        tags = cls.objects.filter(content__pk=cid).values('tag_id')
-        tags = [t['tag_id'] for t in tags]
-        return tags
+    def get_tids_by_cid(cls, cid):
+        tids = cls.objects.filter(content_id=cid).values('tag_id')
+        tids = [t['tag_id'] for t in tids]
+        return tids
+
+    @classmethod
+    def get_limit_cids(cls, tid, viewd_content_ids, limit: int):
+        cids = cls.objects.all().order_by('updated_at').distinct()
+        if tid:
+            cids = cids.filter(tag_id=tid)
+        if viewd_content_ids:
+            cids = cids.exclude(content_id__in=viewd_content_ids)
+        cids = cids.values('content_id')[:limit]
+        cids = [c['content_id'] for c in cids]
+        return cids

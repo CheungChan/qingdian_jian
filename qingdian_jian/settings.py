@@ -136,6 +136,52 @@ USE_L10N = True
 USE_TZ = False
 
 # 用户设置
+
+LOGGING = {
+    'disable_existing_loggers': False,
+    'version': 1,
+    'handlers': {
+        'console_handler': {
+            # logging handler that outputs log messages to terminal
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',  # message level to be written to console
+            'formatter': 'standard',
+        },
+        'default_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/tmp/qingdian_jian.log',  # 日志输出文件
+            'maxBytes': 1024 * 1024 * 1024 * 5,  # 文件大小
+            'backupCount': 5,  # 备份份数
+            "encoding": "utf-8",
+            'formatter': 'standard',  # 使用哪种formatters日志格式
+        },
+    },
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(name)s.%(funcName)s:%(lineno)d] [%(levelname)s]: %(message)s'},
+    },
+    'loggers': {
+        'jian': {
+            # this sets root level logger to log debug and higher level
+            # logs to console. All other loggers inherit settings from
+            # root level logger.
+            'handlers': ['console_handler', "default_handler"],
+            'level': 'DEBUG',
+            # 'propagate': True,  # this tells logger to send logging message
+            # to its parent (will send if set to True)
+        },
+        # 'django': {
+        #     # this sets root level logger to log debug and higher level
+        #     # logs to console. All other loggers inherit settings from
+        #     # root level logger.
+        #     'handlers': ['console_handler', "default_handler"],
+        #     'level': 'DEBUG',
+        #     # 'propagate': True,  # this tells logger to send logging message
+        #     # to its parent (will send if set to True)
+        # },
+    },
+}
 STATIC_URL = '/static/'
 if DEBUG:
     REDIS_HOST = '10.10.6.5'
