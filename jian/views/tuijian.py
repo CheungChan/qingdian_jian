@@ -27,12 +27,9 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    jian = algo_jian_by_tag(uid, n)
-    jian_cids = jian['jian_cids']
-    j = jian['j']
-    n = jian['n']
-    store_tuijian_history(uid, jian_cids)
-    j = {'status': 0, 'data': jian_cids, 'j': j, 'n': n}
+    data = algo_jian_by_tag(uid, n)
+    store_tuijian_history(uid, data['jids'])
+    j = {'status': 0, 'data': data}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
 

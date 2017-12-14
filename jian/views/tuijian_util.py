@@ -16,20 +16,17 @@ def store_tuijian_history(uid: int, jian_cids: list):
     :param jian_cids:
     :return:
     """
-    history_list = []
-    for j in jian_cids:
-        data = {'uid': uid, 'jian_id': j, 'update_time': datetime.now()}
-        history_list.append(data)
+    data = {'uid': uid, 'jids': jian_cids, 'update_time': datetime.now()}
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
-    db.insert_many(history_list)
-    logger.info(f'存储推荐记录{history_list}')
+    db.insert_one(data)
+    logger.info(f'存储推荐记录{data}')
 
 
 def get_jian_history(uid: int):
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     history = []
     for h in db.find({'uid': uid}):
-        history.append(h['jian_id'])
+        history += h['jids']
     logger.info(f'获取到推荐过的历史 {history}')
     return history
 
