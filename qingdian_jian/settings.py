@@ -172,13 +172,8 @@ LOGGING = {
             # to its parent (will send if set to True)
         },
         # 'django': {
-        #     # this sets root level logger to log debug and higher level
-        #     # logs to console. All other loggers inherit settings from
-        #     # root level logger.
         #     'handlers': ['console_handler', "default_handler"],
         #     'level': 'DEBUG',
-        #     # 'propagate': True,  # this tells logger to send logging message
-        #     # to its parent (will send if set to True)
         # },
     },
 }

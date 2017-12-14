@@ -3,7 +3,7 @@ from collections import Counter
 from random import shuffle
 
 from jian import models
-from jian.views.tuijian_util import get_trackcids_tracktids, get_jian_history
+from jian.views.tuijian_util import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
 
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def algo_jian_by_tag(uid, n):
     # 找到此用户的浏览记录
     _, tracked_tids = get_trackcids_tracktids(uid)
+    all_diss_cids, _ = get_track_disscids_diss_tids(uid)
     has_jianed_ids = get_jian_history(uid)
     len_tracked = len(tracked_tids)
     logger.info(f'uid {uid} 找到tids个数 {len_tracked}')
@@ -48,18 +49,20 @@ def algo_jian_by_tag(uid, n):
         for tid, limit in tid_num:
             if limit == 0:
                 continue
-            cids = models.ContentsTag.get_limit_cids(tid, has_jianed_ids + jian_cids, limit)
+            all_jianed_cids = has_jianed_ids + jian_cids
+            cids = models.ContentsTag.get_limit_cids(tid, all_jianed_cids, all_diss_cids, limit)
             jian_cids += cids
         jian_cids = list(set(jian_cids))[:n]
     len_jian = len(jian_cids)
     logger.info(f'获得推荐{len_jian}个')
     len_lack = n - len_jian
     if len_lack > 0:
-        jian_cids += models.ContentsTag.get_limit_cids(None, has_jianed_ids + jian_cids, len_lack)
+        all_jianed_cids = has_jianed_ids + jian_cids
+        jian_cids += models.ContentsTag.get_limit_cids(None, all_jianed_cids, all_diss_cids, len_lack)
         logger.info(f'不够，从最新中获取{len_lack}个')
     if len(jian_cids) < n:
         logger.info('用户看完了所有内容，随机选取内容')
         len_lack = n
-        jian_cids = models.ContentsTag.get_limit_cids(None, None, len_lack)
+        jian_cids = models.ContentsTag.get_limit_cids(None, None, all_diss_cids, len_lack)
     shuffle(jian_cids)
     return {'jian_cids': jian_cids, 'j': len_jian, 'n': len_lack}

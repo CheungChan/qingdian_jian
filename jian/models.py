@@ -24,11 +24,12 @@ class ContentsTag(models.Model):
         return tids
 
     @classmethod
-    def get_limit_cids(cls, tid, all_jianed_cids, limit: int):
+    def get_limit_cids(cls, tid, all_jianed_cids, all_diss_cids, limit: int):
         """
-        获取（指定标签的）没看过的 指定条数内容
+        获取（指定标签的）没看过的 不是不喜欢的 指定条数内容
         :param tid:
         :param all_jianed_cids:
+        :param all_diss_cids:
         :param limit:
         :return:
         """
@@ -37,6 +38,8 @@ class ContentsTag(models.Model):
             cids = cids.filter(tag_id=tid)
         if all_jianed_cids:
             cids = cids.exclude(content_id__in=all_jianed_cids)
+        if all_diss_cids:
+            cids = cids.exclude(content_id__in=all_diss_cids)
         cids = cids.values('content_id')[:limit]
         cids = [c['content_id'] for c in cids]
         return cids
