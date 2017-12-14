@@ -32,11 +32,11 @@ class ContentsTag(models.Model):
         :param limit:
         :return:
         """
-        cids = cls.objects.all().distinct()
+        cids = cls.objects.all().distinct().order_by('?')
         if tid:
             cids = cids.filter(tag_id=tid)
         if all_jianed_cids:
-            cids = cids.exclude(content_id__in=all_jianed_cids).order_by('updated_at')
+            cids = cids.exclude(content_id__in=all_jianed_cids)
         cids = cids.values('content_id')[:limit]
         cids = [c['content_id'] for c in cids]
         return cids
