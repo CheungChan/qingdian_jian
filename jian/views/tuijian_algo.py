@@ -62,4 +62,4 @@ def algo_jian_by_tag(uid, n):
         len_lack = n
         jian_cids = models.ContentsTag.get_limit_cids(None, None, len_lack)
     shuffle(jian_cids)
-    return {'jian_cids': jian_cids, 'jian_num': len_jian, 'new_num': len_lack}
+    return {'jian_cids': jian_cids, 'j': len_jian, 'n': len_lack}

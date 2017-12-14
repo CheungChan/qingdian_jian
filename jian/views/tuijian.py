@@ -29,10 +29,10 @@ def cids_by_uid(request):
         return JsonResponse(j, safe=False)
     jian = algo_jian_by_tag(uid, n)
     jian_cids = jian['jian_cids']
-    jian_num = jian['jian_num']
-    new_num = jian['new_num']
+    j = jian['j']
+    n = jian['n']
     store_tuijian_history(uid, jian_cids)
-    j = {'status': 0, 'data': jian_cids, 'jian_num': jian_num, 'new_num': new_num}
+    j = {'status': 0, 'data': jian_cids, 'j': j, 'n': n}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
 
