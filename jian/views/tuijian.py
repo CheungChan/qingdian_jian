@@ -1,13 +1,10 @@
 import logging
-from collections import Counter
-from random import shuffle
 
 from django.http import JsonResponse
 
-from jian import models
-from qingdian_jian.utils import get_mongo_collection, trans_int
 from jian.views.tuijian_algo import get_jiancids_algo_tag
 from jian.views.tuijian_util import store_tuijian_history
+from qingdian_jian.utils import trans_int
 
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'

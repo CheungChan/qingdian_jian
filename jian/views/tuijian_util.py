@@ -1,12 +1,7 @@
 import logging
-from collections import Counter
-from random import shuffle
-
 from datetime import datetime
-from django.http import JsonResponse
 
-from jian import models
-from qingdian_jian.utils import get_mongo_collection, trans_int
+from qingdian_jian.utils import get_mongo_collection
 
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'

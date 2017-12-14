@@ -3,7 +3,6 @@ from collections import Counter
 from random import shuffle
 
 from jian import models
-from qingdian_jian.utils import get_mongo_collection
 from jian.views.tuijian_util import get_trackcids_tracktids, get_jian_history
 
 TRACK_COLLECTION_NAME = 'jian_track'
