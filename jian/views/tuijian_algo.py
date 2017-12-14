@@ -10,7 +10,7 @@ TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 logger = logging.getLogger(__name__)
 
 
-def get_jiancids_algo_tag(uid, n):
+def algo_jian_by_tag(uid, n):
     # 找到此用户的浏览记录
     _, tracked_tids = get_trackcids_tracktids(uid)
     has_jianed_ids = get_jian_history(uid)
@@ -59,6 +59,7 @@ def get_jiancids_algo_tag(uid, n):
         logger.info(f'不够，从最新中获取{len_lack}个')
     if len(jian_cids) < n:
         logger.info('用户看完了所有内容，随机选取内容')
-        jian_cids = models.ContentsTag.get_limit_cids(None, None, n)
+        len_lack = n
+        jian_cids = models.ContentsTag.get_limit_cids(None, None, len_lack)
     shuffle(jian_cids)
-    return jian_cids
+    return {'jian_cids': jian_cids, 'jian_num': len_jian, 'new_num': len_lack}

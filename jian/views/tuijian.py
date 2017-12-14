@@ -2,7 +2,7 @@ import logging
 
 from django.http import JsonResponse
 
-from jian.views.tuijian_algo import get_jiancids_algo_tag
+from jian.views.tuijian_algo import algo_jian_by_tag
 from jian.views.tuijian_util import store_tuijian_history
 from qingdian_jian.utils import trans_int
 
@@ -27,9 +27,12 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    jian_cids = get_jiancids_algo_tag(uid, n)
+    jian = algo_jian_by_tag(uid, n)
+    jian_cids = jian['jian_cids']
+    jian_num = jian['jian_num']
+    new_num = jian['new_num']
     store_tuijian_history(uid, jian_cids)
-    j = {'status': 0, 'data': jian_cids}
+    j = {'status': 0, 'data': jian_cids, 'jian_num': jian_num, 'new_num': new_num}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
 
