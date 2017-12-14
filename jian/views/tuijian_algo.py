@@ -57,5 +57,8 @@ def get_jiancids_algo_tag(uid, n):
     if len_lack > 0:
         jian_cids += models.ContentsTag.get_limit_cids(None, has_jianed_ids + jian_cids, len_lack)
         logger.info(f'不够，从最新中获取{len_lack}个')
+    if len(jian_cids) < n:
+        logger.info('用户看完了所有内容，随机选取内容')
+        jian_cids = models.ContentsTag.get_limit_cids(None, None, n)
     shuffle(jian_cids)
     return jian_cids
