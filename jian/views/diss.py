@@ -28,9 +28,8 @@ def track_diss(request):
 
 def diss_list(request):
     uid = request.GET.get('uid')
-    cid = request.GET.get('cid')
-    uid, cid = trans_int(uid, cid)
-    if uid is None or cid is None:
+    uid = trans_int(uid)
+    if uid is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
     db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
