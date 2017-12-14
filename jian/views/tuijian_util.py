@@ -22,11 +22,14 @@ def store_tuijian_history(uid: int, jian_cids: list):
     logger.info(f'存储推荐记录{data}')
 
 
-def get_jian_history(uid: int):
+def get_jian_history(uid: int, begin=None, end=None):
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     history = []
-    for h in db.find({'uid': uid}):
+    hs = db.find({'uid': uid})
+    for h in hs:
         history += h['jids']
+    if begin and end:
+        history = history[begin:end]
     logger.info(f'获取到推荐过的历史 {history}')
     return history
 
