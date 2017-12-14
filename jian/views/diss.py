@@ -28,6 +28,7 @@ def track_diss(request):
 
 def diss_list(request):
     uid = request.GET.get('uid')
+    cid = request.GET.get('cid')
     uid, cid = trans_int(uid, cid)
     if uid is None or cid is None:
         j = {'status': -1, 'data': []}
