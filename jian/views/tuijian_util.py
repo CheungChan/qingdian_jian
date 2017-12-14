@@ -28,7 +28,7 @@ def get_jian_history(uid: int, begin=None, end=None):
     hs = db.find({'uid': uid})
     for h in hs:
         history += h['jids']
-    if begin and end:
+    if begin is not None and end is not None:
         history = history[begin:end]
     logger.info(f'获取到推荐过的历史 {history}')
     return history
