@@ -38,7 +38,7 @@ def trans_int(*param, error_return=None):
             p = int(p)
             int_param.append(p)
         except (ValueError, TypeError):
-            return error_return
+            return [error_return for _ in param]
     return int_param
 
 

@@ -7,6 +7,7 @@ from jian import models
 from qingdian_jian.utils import get_mongo_collection, trans_int
 
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
+TRACK_DISS_THEME_COLLECTION_NAME = 'jian_track_diss_theme'
 logger = logging.getLogger(__name__)
 
 
@@ -17,18 +18,41 @@ def track_diss(request):
     if uid is None or cid is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    tags = models.ContentsTag.get_tids_by_cid(cid)
+    data = {'uid': uid, 'cid': cid}
     db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
-    data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now()}
-    db.insert_one(data)
-    logger.info(f'track_diss data={data}')
+    if db.count(data) == 0:
+        tags = models.ContentsTag.get_tids_by_cid(cid)
+        data.update({'tids': tags, 'update_time': datetime.now()})
+        db.insert_one(data)
+        logger.info(f'插入，track_diss data={data}')
+    else:
+        logger.error(f'已存在， track_diss data={data}')
+    j = {'status': 0, 'msg': 'ok'}
+    return JsonResponse(j, safe=False)
+
+
+def track_diss_theme(request):
+    uid = request.GET.get('uid')
+    tid = request.GET.get('tid')
+    uid, tid = trans_int(uid, tid)
+    if uid is None or tid is None:
+        j = {'status': -1, 'data': []}
+        return JsonResponse(j, safe=False)
+    db = get_mongo_collection(TRACK_DISS_THEME_COLLECTION_NAME)
+    data = {'uid': uid, 'tid': tid}
+    if db.count(data) == 0:
+        data.update({'update_time': datetime.now()})
+        db.insert_one(data)
+        logger.info(f'插入，track_diss_theme data={data}')
+    else:
+        logger.error(f'已存在， track_diss_theme data={data}')
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
 
 
 def diss_list(request):
     uid = request.GET.get('uid')
-    uid = trans_int(uid)
+    uid, = trans_int(uid)
     if uid is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
@@ -39,4 +63,20 @@ def diss_list(request):
     records = list(set(records))
     j = {'status': 0, 'data': records}
     logger.info(f'diss_list j={j}')
+    return JsonResponse(j, safe=False)
+
+
+def diss_theme_list(request):
+    uid = request.GET.get('uid')
+    uid, = trans_int(uid)
+    if uid is None:
+        j = {'status': -1, 'data': []}
+        return JsonResponse(j, safe=False)
+    db = get_mongo_collection(TRACK_DISS_THEME_COLLECTION_NAME)
+    records = []
+    for r in db.find({'uid': uid}):
+        records.append(r['tid'])
+    records = list(set(records))
+    j = {'status': 0, 'data': records}
+    logger.info(f'diss_theme_list j={j}')
     return JsonResponse(j, safe=False)
