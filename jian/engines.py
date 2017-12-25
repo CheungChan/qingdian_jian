@@ -60,7 +60,6 @@ class BaseEngine():
         self.n = n
         self.len_jian = 0
         self.len_rand = 0
-        result_cids = self.recommend()
 
     def recommend(self):
         """
