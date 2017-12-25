@@ -5,8 +5,6 @@ from random import shuffle
 from jian import models
 from jian.views.tuijian_util import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
 
-TRACK_COLLECTION_NAME = 'jian_track'
-TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 logger = logging.getLogger(__name__)
 
 

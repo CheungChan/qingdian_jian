@@ -2,7 +2,7 @@ import logging
 
 from django.http import JsonResponse
 
-from jian.views.tuijian_algo import algo_jian_by_tag
+from jian.engines import TagBasedEngine
 from jian.views.tuijian_util import store_tuijian_history, get_jian_history
 from qingdian_jian.utils import trans_int
 
@@ -18,7 +18,7 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    data = algo_jian_by_tag(uid, n)
+    data = TagBasedEngine(uid, n).recommend()
     store_tuijian_history(uid, data['jids'])
     j = {'status': 0, 'data': data}
     logger.info(f'jian j= {j}')
