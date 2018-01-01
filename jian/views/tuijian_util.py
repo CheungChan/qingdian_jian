@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 
+import pymongo
+
 from qingdian_jian.utils import get_mongo_collection
 
 TRACK_COLLECTION_NAME = 'jian_track'
@@ -25,7 +27,7 @@ def store_tuijian_history(uid: int, jian_cids: list):
 def get_jian_history(uid: int, begin=None, end=None):
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     history = []
-    hs = db.find({'uid': uid})
+    hs = db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING)
     for h in hs:
         history += h['jids']
     if begin is not None and end is not None:
@@ -38,7 +40,7 @@ def get_trackcids_tracktids(uid: int):
     db = get_mongo_collection(TRACK_COLLECTION_NAME)
     trackcids = []
     tracktids = []
-    for t in db.find({'uid': uid}):
+    for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         trackcids.append(t['cid'])
         tracktids += t['tids']
     logger.info(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
@@ -49,7 +51,7 @@ def get_track_disscids_diss_tids(uid: int):
     db = get_mongo_collection(TRACK_DISS_COLLECTION_NAME)
     diss_cids = []
     diss_tids = []
-    for d in db.find({'uid': uid}):
+    for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         diss_cids.append(d['cid'])
         diss_tids += d['tids']
     logger.info(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
