@@ -162,26 +162,30 @@ class TagBasedEngine(BaseEngine):
 
 
 class ItemBasedCFEngine(BaseEngine):
+    """
+    基于item的协同过滤引擎
+    """
 
     def recommend(self):
         pass
 
 
 class UserBasedCFEngine(BaseEngine):
+    """
+    基于user的协同过滤引擎
+    """
     pass
 
 
-class KeywordMatchBasedEngine(BaseEngine):
+class ContentBasedEngine(BaseEngine):
+    """
+    基于内容的推荐引擎
+    """
     pass
 
 
 class HotContentBasedEngine(BaseEngine):
-    pass
-
-
-class HotTopicBasedEngine(BaseEngine):
-    pass
-
-
-class RecentBehaviorBasedEngine(BaseEngine):
+    """
+    基于流行度，热门的推荐引擎
+    """
     pass
