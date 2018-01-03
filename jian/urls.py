@@ -9,4 +9,5 @@ urlpatterns = [
     path('diss/theme_list', diss.diss_theme_list),
     path('cids_by_uid', tuijian.cids_by_uid),
     path('jian_history', tuijian.jian_history),
+    path('test',tuijian.test),
 ]

@@ -1,3 +1,4 @@
+from typing import Dict
 from django.db import models
 
 
@@ -43,3 +44,34 @@ class ContentsTag(models.Model):
         cids = cids.values('content_id')[:limit]
         cids = [c['content_id'] for c in cids]
         return cids
+
+
+class Contents(models.Model):
+    id = models.IntegerField(primary_key=True)
+    theme_id = models.IntegerField()
+    thirdparty_id = models.CharField(max_length=150, blank=True, null=True)
+    publish_time = models.DateTimeField(blank=True, null=True)
+    title = models.TextField()
+    desp = models.TextField()
+    contents_refter_type = models.IntegerField()
+    media_type = models.IntegerField()
+    pic_link = models.CharField(max_length=240)
+    likes_count = models.IntegerField()
+    comment_count = models.IntegerField()
+    status = models.IntegerField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    mongo_id = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'contents'
+
+    @classmethod
+    def get_contentstr_list(cls, cid=None) -> Dict:
+        records = cls.objects.all()
+        if cid:
+            records = records.filter(id=cid)
+        records = records.values('id', 'title', 'desp')
+        d = {r['id']: r['title'] + r['desp'] for r in records}
+        return d

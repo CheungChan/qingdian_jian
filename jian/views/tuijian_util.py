@@ -43,6 +43,8 @@ def get_trackcids_tracktids(uid: int):
     for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         trackcids.append(t['cid'])
         tracktids += t['tids']
+    trackcids = list(set(trackcids))
+    tracktids = list(set(tracktids))
     logger.info(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
     return trackcids, tracktids
 
@@ -54,5 +56,7 @@ def get_track_disscids_diss_tids(uid: int):
     for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         diss_cids.append(d['cid'])
         diss_tids += d['tids']
+    diss_cids = list(set(diss_cids))
+    diss_tids = list(set(diss_tids))
     logger.info(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
     return diss_cids, diss_tids
