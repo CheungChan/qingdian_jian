@@ -2,6 +2,7 @@ import logging
 
 from jian import models
 from jian.engines.base_engine import BaseEngine
+from qingdian_jian.utils import override
 import re
 from functools import lru_cache
 from math import sqrt
@@ -25,35 +26,27 @@ class ContentBasedEngine(BaseEngine):
     def __init__(self, uid, n):
         super(ContentBasedEngine, self).__init__(uid, n)
 
-    def recommend(self):
-
-        result_cids = []
-        len_tracked = len(self.tracked_cids)
-        logger.info(f'uid {self.uid} 找到cids个数 {len_tracked}')
-        if len_tracked == 0:
-            pass
-        else:
-            tracked_id_str = {}
-            for cid in self.tracked_cids:
-                d = models.Contents.get_contentstr_list(cid)
-                if not d:
-                    continue
-                else:
-                    tracked_id_str[cid] = d.get(cid, '')
-            logger.info(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
-            all_id_str = models.Contents.get_contentstr_list()
-            logger.info(f'所有内容id和内容 all_id_str={all_id_str}')
-            id_sim_dict: Dict[int, float] = {}
-            for id1, str1 in tracked_id_str.items():
-                for id2, str2 in all_id_str.items():
-                    sim = self.str_similarity(str1, str2)
-                    if sim > 0.0:
-                        id_sim_dict.setdefault(id2, 0)
-                        id_sim_dict[id2] += sim
-            logger.info(f'求得形似的id和形似度id_sim_dict：{id_sim_dict}')
-            result_cids = [r for r in id_sim_dict.keys()]
-        self.order_content(result_cids)
-        return {'jids': result_cids, 'j': self.len_jian, 'n': self.len_rand}
+    @override
+    def core_algo(self):
+        tracked_id_str = {}
+        for cid in self.tracked_cids:
+            d = models.Contents.get_contentstr_list(cid)
+            if not d:
+                continue
+            else:
+                tracked_id_str[cid] = d.get(cid, '')
+        logger.info(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
+        all_id_str = models.Contents.get_contentstr_list()
+        logger.info(f'所有内容id和内容 all_id_str={all_id_str}')
+        result_id_sim_dict: Dict[int, float] = {}
+        for id1, str1 in tracked_id_str.items():
+            for id2, str2 in all_id_str.items():
+                sim = self.str_similarity(str1, str2)
+                if sim > 0.0:
+                    result_id_sim_dict.setdefault(id2, 0)
+                    result_id_sim_dict[id2] += sim
+        logger.info(f'求得形似的id和形似度id_sim_dict：{result_id_sim_dict}')
+        return result_id_sim_dict
 
     @classmethod
     @lru_cache(None, typed=True)

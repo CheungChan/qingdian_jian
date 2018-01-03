@@ -42,6 +42,15 @@ def trans_int(*param, error_return=None):
     return int_param
 
 
+def override(f):
+    """
+    装饰器，提醒属于override的方法。
+    :param f:
+    :return:
+    """
+    return f
+
+
 if __name__ == '__main__':
     r = get_redis()
     # r.set('test_chenzhang','测试',10)

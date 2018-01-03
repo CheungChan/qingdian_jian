@@ -20,8 +20,7 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    data = TagBasedEngine(uid, n).recommend()
-    store_tuijian_history(uid, data['jids'])
+    data = TagBasedEngine(uid, n).process_recommend()
     j = {'status': 0, 'data': data}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
@@ -52,7 +51,7 @@ def test(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    data = ContentBasedEngine(uid, n).recommend()
+    data = ContentBasedEngine(uid, n).process_recommend()
     j = {'status': 0, 'data': data}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)

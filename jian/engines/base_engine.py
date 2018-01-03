@@ -1,5 +1,5 @@
 import logging
-from random import shuffle
+from typing import Dict
 
 from werkzeug.utils import cached_property
 
@@ -57,27 +57,31 @@ class BaseEngine():
         """
         self.uid = uid
         self.n = n
-        self.len_jian = 0
-        self.len_rand = 0
+        self.prepare_signature_vector()
 
-    def recommend(self):
+    def prepare_signature_vector(self):
+        """
+        生成用户特征向量
+        :return:
+        """
+        self.len_tracked = len(self.tracked_tids)
+        logger.info(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
+
+    def core_algo(self):
+        """
+        算法核心
+        :return:
+        """
+        raise Exception
+
+    def process_recommend(self):
         """
         推荐内容
         :return:
         """
-        raise Exception
-
-    def filter_content(self):
-        """
-        过滤内容
-        :return:
-        """
-        raise Exception
-
-    def order_content(self, jian_cids):
-        """
-        对内容进行排序
-        :param jian_cids:
-        :return:
-        """
-        shuffle(jian_cids)
+        result: Dict[int, float] = {}
+        if self.len_tracked == 0:
+            pass
+        else:
+            result = self.core_algo()
+        return result
