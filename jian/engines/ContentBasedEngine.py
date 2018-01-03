@@ -3,6 +3,7 @@ import logging
 from jian import models
 from jian.engines.BaseEngine import BaseEngine
 import re
+from functools import lru_cache
 from math import sqrt
 import os
 import jieba
@@ -35,7 +36,6 @@ class ContentBasedEngine(BaseEngine):
             tracked_id_str = {}
             for cid in self.tracked_cids:
                 d = models.Contents.get_contentstr_list(cid)
-                print(d)
                 if not d:
                     continue
                 else:
@@ -56,6 +56,7 @@ class ContentBasedEngine(BaseEngine):
         return {'jids': result_cids, 'j': self.len_jian, 'n': self.len_rand}
 
     @staticmethod
+    @lru_cache(None, typed=True)
     def ignore_str(s: str) -> str:
         """
         去除字符串中的非人类语言
@@ -65,12 +66,13 @@ class ContentBasedEngine(BaseEngine):
         IGNORE_MATCH = re.compile('^\S+：|@\S+\s|cn：|服装：|con：')
         # 用户昵称|@xxx|cn:|服装:|con:
         at = IGNORE_MATCH.findall(s)
-        logger.info(f'去除非人类语言，发现了匹配 {at}')
+        # logger.info(f'去除非人类语言，发现了匹配 {at}')
         for a in at:
             s = s.replace(a, '')
         return s
 
     @staticmethod
+    @lru_cache(None, typed=True)
     def no_stop_flag_str(s: str, stop_flag=None) -> list:
         """
         去除特定词性
@@ -88,6 +90,7 @@ class ContentBasedEngine(BaseEngine):
         return result
 
     @staticmethod
+    @lru_cache(None, typed=True)
     def tf_idf_str(s, topK=20, withWeight=True, ignore=True) -> list:
         """
         使用TF-IDF算法，去除关键词
@@ -103,6 +106,7 @@ class ContentBasedEngine(BaseEngine):
         return a
 
     @staticmethod
+    @lru_cache(None, typed=True)
     def text_rank_str(s, topK=20, withWeight=True) -> list:
         """
         使用text_rank算法，其余同tf_idf_str
@@ -159,6 +163,7 @@ class ContentBasedEngine(BaseEngine):
                 ContentBasedEngine.magnitude(f1) * ContentBasedEngine.magnitude(f2) + 0.00000001)
 
     @staticmethod
+    @lru_cache(None, typed=True)
     def str_similarity(s1: str, s2: str) -> float:
         """
         求解两个字符串的相似度
