@@ -1,7 +1,7 @@
 import logging
 
 from jian import models
-from jian.engines.BaseEngine import BaseEngine
+from jian.engines.base_engine import BaseEngine
 import re
 from functools import lru_cache
 from math import sqrt
@@ -46,7 +46,7 @@ class ContentBasedEngine(BaseEngine):
             id_sim_dict: Dict[int, float] = {}
             for id1, str1 in tracked_id_str.items():
                 for id2, str2 in all_id_str.items():
-                    sim = ContentBasedEngine.str_similarity(str1, str2)
+                    sim = self.str_similarity(str1, str2)
                     if sim > 0.0:
                         id_sim_dict.setdefault(id2, 0)
                         id_sim_dict[id2] += sim
@@ -55,9 +55,9 @@ class ContentBasedEngine(BaseEngine):
         self.order_content(result_cids)
         return {'jids': result_cids, 'j': self.len_jian, 'n': self.len_rand}
 
-    @staticmethod
+    @classmethod
     @lru_cache(None, typed=True)
-    def ignore_str(s: str) -> str:
+    def ignore_str(cls, s: str) -> str:
         """
         去除字符串中的非人类语言
         :param s:
@@ -71,9 +71,9 @@ class ContentBasedEngine(BaseEngine):
             s = s.replace(a, '')
         return s
 
-    @staticmethod
+    @classmethod
     @lru_cache(None, typed=True)
-    def no_stop_flag_str(s: str, stop_flag=None) -> list:
+    def no_stop_flag_str(cls, s: str, stop_flag=None) -> list:
         """
         去除特定词性
         :param s:
@@ -89,9 +89,9 @@ class ContentBasedEngine(BaseEngine):
                 result.append(word)
         return result
 
-    @staticmethod
+    @classmethod
     @lru_cache(None, typed=True)
-    def tf_idf_str(s, topK=20, withWeight=True, ignore=True) -> list:
+    def tf_idf_str(cls, s, topK=20, withWeight=True, ignore=True) -> list:
         """
         使用TF-IDF算法，去除关键词
         :param s:
@@ -100,14 +100,14 @@ class ContentBasedEngine(BaseEngine):
         :return:
         """
         if ignore:
-            s = ContentBasedEngine.ignore_str(s)
+            s = cls.ignore_str(s)
         a = jieba.analyse.extract_tags(s, withWeight=withWeight, topK=topK)
         logger.info(a)
         return a
 
-    @staticmethod
+    @classmethod
     @lru_cache(None, typed=True)
-    def text_rank_str(s, topK=20, withWeight=True) -> list:
+    def text_rank_str(cls, s, topK=20, withWeight=True) -> list:
         """
         使用text_rank算法，其余同tf_idf_str
         :param s:
@@ -118,8 +118,8 @@ class ContentBasedEngine(BaseEngine):
         a = jieba.analyse.textrank(s, withWeight=withWeight, topK=topK)
         return a
 
-    @staticmethod
-    def merge_tag(tag1=None, tag2=None):
+    @classmethod
+    def merge_tag(cls, tag1=None, tag2=None):
         v1 = []
         v2 = []
         tag_dict1 = {i[0]: i[1] for i in tag1}
@@ -137,8 +137,8 @@ class ContentBasedEngine(BaseEngine):
                 v2.append(0)
         return v1, v2
 
-    @staticmethod
-    def dot_product(v1, v2):
+    @classmethod
+    def dot_product(cls, v1, v2):
         """
         计算矩阵的点积
         :param v1:
@@ -147,31 +147,31 @@ class ContentBasedEngine(BaseEngine):
         """
         return sum(a * b for a, b in zip(v1, v2))
 
-    @staticmethod
-    def magnitude(vector):
-        return sqrt(ContentBasedEngine.dot_product(vector, vector))
+    @classmethod
+    def magnitude(cls, vector):
+        return sqrt(cls.dot_product(vector, vector))
 
-    @staticmethod
-    def similarity(f1: list, f2: list) -> float:
+    @classmethod
+    def similarity(cls, f1: list, f2: list) -> float:
         """
         计算余弦相似度
         :param f1: 以(关键词,词频)为元素的列表1
         :param f2: 以(关键词,词频)为元素的列表2
         :return:
         """
-        return ContentBasedEngine.dot_product(f1, f2) / (
-                ContentBasedEngine.magnitude(f1) * ContentBasedEngine.magnitude(f2) + 0.00000001)
+        return cls.dot_product(f1, f2) / (
+                cls.magnitude(f1) * cls.magnitude(f2) + 0.00000001)
 
-    @staticmethod
+    @classmethod
     @lru_cache(None, typed=True)
-    def str_similarity(s1: str, s2: str) -> float:
+    def str_similarity(cls, s1: str, s2: str) -> float:
         """
         求解两个字符串的相似度
         :param s1: 字符串1
         :param s2: 字符串2
         :return:
         """
-        tag1 = ContentBasedEngine.tf_idf_str(s1)
-        tag2 = ContentBasedEngine.tf_idf_str(s2)
-        v1, v2 = ContentBasedEngine.merge_tag(tag1, tag2)
-        return ContentBasedEngine.similarity(v1, v2)
+        tag1 = cls.tf_idf_str(s1)
+        tag2 = cls.tf_idf_str(s2)
+        v1, v2 = cls.merge_tag(tag1, tag2)
+        return cls.similarity(v1, v2)

@@ -2,8 +2,8 @@ import logging
 
 from django.http import JsonResponse
 
-from jian.engines.TagBasedEngine import TagBasedEngine
-from jian.engines.ContentBasedEngine import ContentBasedEngine
+from jian.engines.tag_based_engine import TagBasedEngine
+from jian.engines.content_based_engine import ContentBasedEngine
 from jian.views.tuijian_util import store_tuijian_history, get_jian_history
 from qingdian_jian.utils import trans_int
 

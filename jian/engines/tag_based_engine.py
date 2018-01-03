@@ -2,7 +2,7 @@ import logging
 from collections import Counter
 
 from jian import models
-from jian.engines.BaseEngine import BaseEngine
+from jian.engines.base_engine import BaseEngine
 
 logger = logging.getLogger(__name__)
 
