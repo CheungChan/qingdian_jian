@@ -85,3 +85,6 @@ class BaseEngine():
         else:
             result = self.core_algo()
         return result
+
+    def __call__(self, *args, **kwargs):
+        return self.process_recommend()

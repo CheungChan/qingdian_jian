@@ -9,7 +9,7 @@ from math import sqrt
 import os
 import jieba
 from logzero import logger
-from typing import Dict
+from typing import List
 
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
@@ -24,6 +24,7 @@ class ContentBasedEngine(BaseEngine):
     """
 
     def __init__(self, uid, n):
+        logger.info('创建基于内容的引擎')
         super(ContentBasedEngine, self).__init__(uid, n)
 
     @override
@@ -38,15 +39,14 @@ class ContentBasedEngine(BaseEngine):
         logger.info(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
         all_id_str = models.Contents.get_contentstr_list()
         logger.info(f'所有内容id和内容 all_id_str={all_id_str}')
-        result_id_sim_dict: Dict[int, float] = {}
+        result: List[int,float] = []
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():
                 sim = self.str_similarity(str1, str2)
                 if sim > 0.0:
-                    result_id_sim_dict.setdefault(id2, 0)
-                    result_id_sim_dict[id2] += sim
-        logger.info(f'求得形似的id和形似度id_sim_dict：{result_id_sim_dict}')
-        return result_id_sim_dict
+                    result.append((id2,sim))
+        logger.info(f'求得形似的id和形似度：{result}')
+        return result
 
     @classmethod
     @lru_cache(None, typed=True)

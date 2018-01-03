@@ -1,6 +1,6 @@
 import logging
 from collections import Counter
-from typing import Dict
+from typing import List, Tuple
 
 from jian import models
 from jian.engines.base_engine import BaseEngine
@@ -15,11 +15,12 @@ class TagBasedEngine(BaseEngine):
     """
 
     def __init__(self, uid, n):
+        logger.info('创建基于标签的引擎')
         super(TagBasedEngine, self).__init__(uid, n)
 
     @override
     def core_algo(self):
-        result: Dict[int, float] = {}
+        result: List[Tuple[int, float]] = []
         # 所有浏览记录里面的tid和要出现几个cid
         c = Counter(self.tracked_tids)
         most_common = c.most_common()
@@ -48,8 +49,8 @@ class TagBasedEngine(BaseEngine):
         for tid, limit in tid_num:
             if limit == 0:
                 continue
-            all_jianed_cids = self.jianed_cids + [r for r in result.keys()]
+            all_jianed_cids = self.jianed_cids + [r[0] for r in result]
             cids = models.ContentsTag.get_limit_cids(tid, all_jianed_cids, self.dissed_cids, limit)
             for c in cids:
-                result[c] = limit / self.n
+                result.append((c, limit / self.n))
         return result
