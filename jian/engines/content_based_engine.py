@@ -1,4 +1,4 @@
-import logging
+from logzero import logger
 
 from jian import models
 from jian.engines.base_engine import BaseEngine
@@ -8,7 +8,6 @@ from functools import lru_cache
 from math import sqrt
 import os
 import jieba
-from logzero import logger
 from typing import List
 
 pwd = os.path.dirname(os.path.abspath(__name__))
@@ -24,7 +23,7 @@ class ContentBasedEngine(BaseEngine):
     """
 
     def __init__(self, uid, n):
-        logger.info('创建基于内容的引擎')
+        logger.debug('创建基于内容的引擎')
         super(ContentBasedEngine, self).__init__(uid, n)
 
     @override
@@ -36,16 +35,16 @@ class ContentBasedEngine(BaseEngine):
                 continue
             else:
                 tracked_id_str[cid] = d.get(cid, '')
-        logger.info(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
+        logger.debug(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
         all_id_str = models.Contents.get_contentstr_list()
-        logger.info(f'所有内容id和内容 all_id_str={all_id_str}')
-        result: List[int,float] = []
+        logger.debug(f'所有内容id和内容 all_id_str={all_id_str}')
+        result: List[int, float] = []
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():
                 sim = self.str_similarity(str1, str2)
                 if sim > 0.0:
-                    result.append((id2,sim))
-        logger.info(f'求得形似的id和形似度：{result}')
+                    result.append((id2, sim, self.__class__.__name__))
+        logger.debug(f'result：{result}')
         return result
 
     @classmethod
@@ -95,7 +94,7 @@ class ContentBasedEngine(BaseEngine):
         if ignore:
             s = cls.ignore_str(s)
         a = jieba.analyse.extract_tags(s, withWeight=withWeight, topK=topK)
-        logger.info(a)
+        # logger.debug(a)
         return a
 
     @classmethod

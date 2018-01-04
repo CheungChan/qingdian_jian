@@ -1,14 +1,13 @@
-import logging
+from logzero import logger
 from typing import Dict
+from abc import abstractmethod, ABCMeta
 
 from werkzeug.utils import cached_property
 
 from jian.views.tuijian_util import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
 
-logger = logging.getLogger(__name__)
 
-
-class BaseEngine():
+class BaseEngine(metaclass=ABCMeta):
     """
     所有推荐引擎的基类
     """
@@ -67,12 +66,13 @@ class BaseEngine():
         self.len_tracked = len(self.tracked_tids)
         logger.info(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
 
+    @abstractmethod
     def core_algo(self):
         """
         算法核心
         :return:
         """
-        raise Exception
+        pass
 
     def process_recommend(self):
         """

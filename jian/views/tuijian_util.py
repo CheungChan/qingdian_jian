@@ -1,4 +1,4 @@
-import logging
+from logzero import logger
 from datetime import datetime
 
 import pymongo
@@ -8,7 +8,6 @@ from qingdian_jian.utils import get_mongo_collection
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 JIAN_HISTORY_COLLECTION_NAME = 'jian_history'
-logger = logging.getLogger(__name__)
 
 
 def store_tuijian_history(uid: int, jian_cids: list):
@@ -21,7 +20,7 @@ def store_tuijian_history(uid: int, jian_cids: list):
     data = {'uid': uid, 'jids': jian_cids, 'update_time': datetime.now()}
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     db.insert_one(data)
-    logger.info(f'存储推荐记录{data}')
+    logger.debug(f'存储推荐记录{data}')
 
 
 def get_jian_history(uid: int, begin=None, end=None):
@@ -32,7 +31,7 @@ def get_jian_history(uid: int, begin=None, end=None):
         history += h['jids']
     if begin is not None and end is not None:
         history = history[begin:end]
-    logger.info(f'获取到推荐过的历史 {history}')
+    logger.debug(f'获取到推荐过的历史 {history}')
     return history
 
 
@@ -45,7 +44,7 @@ def get_trackcids_tracktids(uid: int):
         tracktids += t['tids']
     trackcids = list(set(trackcids))
     tracktids = list(set(tracktids))
-    logger.info(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
+    logger.debug(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
     return trackcids, tracktids
 
 
@@ -58,5 +57,5 @@ def get_track_disscids_diss_tids(uid: int):
         diss_tids += d['tids']
     diss_cids = list(set(diss_cids))
     diss_tids = list(set(diss_tids))
-    logger.info(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
+    logger.debug(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
     return diss_cids, diss_tids

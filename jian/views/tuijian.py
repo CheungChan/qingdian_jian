@@ -19,8 +19,8 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    data = ProcessRecommand(uid, n)()
-    j = {'status': 0, 'data': data}
+    data, rawdata = ProcessRecommand(uid, n)()
+    j = {'status': 0, 'data': data, 'rawdata': rawdata}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)
 
