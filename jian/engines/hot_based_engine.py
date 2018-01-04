@@ -1,10 +1,8 @@
-from typing import List, Tuple
-
 from logzero import logger
 
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
-from jian.views.tuijian_util import get_recently_hot_tracked
+from jian.utils import get_recently_hot_tracked
 
 
 class HotBasedEngine(BaseEngine):

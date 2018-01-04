@@ -1,10 +1,10 @@
 from logzero import logger
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 from abc import abstractmethod, ABCMeta
 
 from werkzeug.utils import cached_property
 
-from jian.views.tuijian_util import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
+from jian.utils import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
 
 
 class BaseEngine(metaclass=ABCMeta):

@@ -3,7 +3,7 @@ import logging
 from django.http import JsonResponse
 
 from jian.process_recommand import ProcessRecommand
-from jian.views.tuijian_util import store_tuijian_history, get_jian_history
+from jian.utils import get_jian_history
 from qingdian_jian.utils import trans_int
 
 TRACK_COLLECTION_NAME = 'jian_track'

@@ -1,14 +1,11 @@
 from logzero import logger
-from jian.engines.content_based_engine import ContentBasedEngine
-from jian.engines.tag_based_engine import TagBasedEngine
-from jian.engines.hot_based_engine import HotBasedEngine
 # 两个导入不能去掉，因为用到了eval
 from random import shuffle
 from collections import Counter
 from qingdian_jian.settings import weight
 from math import ceil
 from typing import List
-from jian.views.tuijian_util import store_tuijian_history
+from jian.utils import store_tuijian_history
 
 
 class ProcessRecommand():
