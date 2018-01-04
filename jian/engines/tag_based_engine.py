@@ -50,5 +50,6 @@ class TagBasedEngine(BaseEngine):
             all_jianed_cids = self.jianed_cids + [r[0] for r in result]
             cids = models.ContentsTag.get_limit_cids(tid, all_jianed_cids, self.dissed_cids, limit)
             for c in cids:
-                result.append((c, limit / self.n, self.__class__.__name__))
+                sim = limit / len(cids) / self.n
+                result.append((c, sim, self.__class__.__name__))
         return result

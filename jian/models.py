@@ -68,10 +68,12 @@ class Contents(models.Model):
         db_table = 'contents'
 
     @classmethod
-    def get_contentstr_list(cls, cid=None) -> Dict:
+    def get_contentstr_list(cls, cid=None, nocids=None) -> Dict:
         records = cls.objects.all()
         if cid:
             records = records.filter(id=cid)
+        if nocids:
+            records = records.exclude(id__in=nocids)
         records = records.values('id', 'title', 'desp')
         d = {r['id']: r['title'] + r['desp'] for r in records}
         return d

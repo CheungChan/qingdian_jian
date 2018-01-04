@@ -1,6 +1,7 @@
 from logzero import logger
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
+from jian.engines.hot_based_engine import HotBasedEngine
 # 两个导入不能去掉，因为用到了eval
 from random import shuffle
 from qingdian_jian.settings import weight
@@ -26,19 +27,19 @@ class ProcessRecommand():
 
     def combile_engine_recommad(self):
         logger.info('组合推荐引擎')
-        rawdata = []
 
         for cls, w in weight.items():
             if w == 0:
                 continue
-            engine = eval(f'{cls}({self.uid},{self.n})')
             n = ceil(self.n * w)
             logger.info(f'n={n}')
-            rawdata += engine()
-            logger.info(f'{cls}: {rawdata}')
+            create_engine_code = f'{cls}({self.uid},{n})'
+            logger.info(create_engine_code)
+            engine = eval(create_engine_code)
+            self.rawdata += engine()
+            logger.info(f'{cls}: {self.rawdata}')
             self.dissed_cids += engine.dissed_cids
             self.jianed_cids += engine.jianed_cids
-        self.rawdata = rawdata
 
     def filter_data(self):
         logger.info('过滤')
@@ -49,10 +50,10 @@ class ProcessRecommand():
             if cid not in no_cids:
                 rawdata.append((cid, sim, engine_name))
         self.rawdata = rawdata
+        self.data = list(set([d[0] for d in self.rawdata]))
 
     def order_data(self):
         logger.info('排序')
-        self.data = [d[0] for d in self.rawdata]
         shuffle(self.data)
         self.data = self.data[:self.n]
 

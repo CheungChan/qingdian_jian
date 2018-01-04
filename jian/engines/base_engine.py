@@ -1,5 +1,5 @@
 from logzero import logger
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from abc import abstractmethod, ABCMeta
 
 from werkzeug.utils import cached_property
@@ -67,7 +67,7 @@ class BaseEngine(metaclass=ABCMeta):
         logger.info(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
 
     @abstractmethod
-    def core_algo(self) -> List[tuple[int, float, str]]:
+    def core_algo(self) -> List[Tuple[int, float, str]]:
         """
         算法核心
         :return:
@@ -79,7 +79,7 @@ class BaseEngine(metaclass=ABCMeta):
         推荐内容
         :return:
         """
-        result: List[tuple[int, float, str]] = []
+        result: List[Tuple[int, float, str]] = []
         if self.len_tracked == 0:
             pass
         else:

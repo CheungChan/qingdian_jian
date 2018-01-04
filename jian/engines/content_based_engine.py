@@ -8,7 +8,7 @@ from functools import lru_cache
 from math import sqrt
 import os
 import jieba
-from typing import List
+from typing import List,Tuple
 
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
@@ -28,7 +28,7 @@ class ContentBasedEngine(BaseEngine):
 
     @override
     def core_algo(self):
-        result: List[int, float, str] = []
+        result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
         for cid in self.tracked_cids:
             d = models.Contents.get_contentstr_list(cid)
@@ -37,7 +37,8 @@ class ContentBasedEngine(BaseEngine):
             else:
                 tracked_id_str[cid] = d.get(cid, '')
         logger.debug(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
-        all_id_str = models.Contents.get_contentstr_list()
+        nocids = self.dissed_cids + self.jianed_cids
+        all_id_str = models.Contents.get_contentstr_list(nocids=nocids)
         logger.debug(f'所有内容id和内容 all_id_str={all_id_str}')
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():

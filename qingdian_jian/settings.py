@@ -192,5 +192,6 @@ MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
 weight = {
     'ContentBasedEngine': 0.5,
-    'TagBasedEngine': 0.5
+    'TagBasedEngine': 0.3,
+    'HotBasedEngine': 0.2,
 }
