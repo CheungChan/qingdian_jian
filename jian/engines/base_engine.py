@@ -64,7 +64,7 @@ class BaseEngine(metaclass=ABCMeta):
         :return:
         """
         self.len_tracked = len(self.tracked_tids)
-        logger.info(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
+        logger.debug(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
 
     @abstractmethod
     def core_algo(self) -> List[Tuple[int, float, str]]:

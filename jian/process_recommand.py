@@ -4,6 +4,7 @@ from jian.engines.tag_based_engine import TagBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 # 两个导入不能去掉，因为用到了eval
 from random import shuffle
+from collections import Counter
 from qingdian_jian.settings import weight
 from math import ceil
 from typing import List
@@ -27,17 +28,23 @@ class ProcessRecommand():
 
     def combile_engine_recommad(self):
         logger.info('组合推荐引擎')
+        lack = 0
 
         for cls, w in weight.items():
             if w == 0:
                 continue
             n = ceil(self.n * w)
             logger.info(f'n={n}')
+            n += lack
+            logger.info(f'n+lack={n}')
             create_engine_code = f'{cls}({self.uid},{n})'
             logger.info(create_engine_code)
             engine = eval(create_engine_code)
-            self.rawdata += engine()
-            logger.info(f'{cls}: {self.rawdata}')
+            newdata = engine()
+            lack = (n - len(newdata))
+            logger.info(f'lack={lack}')
+            logger.info(f'{cls}: {newdata}')
+            self.rawdata += newdata
             self.dissed_cids += engine.dissed_cids
             self.jianed_cids += engine.jianed_cids
 
@@ -50,16 +57,19 @@ class ProcessRecommand():
             if cid not in no_cids:
                 rawdata.append((cid, sim, engine_name))
         self.rawdata = rawdata
-        self.data = list(set([d[0] for d in self.rawdata]))
 
     def order_data(self):
         logger.info('排序')
-        shuffle(self.data)
-        self.data = self.data[:self.n]
+        shuffle(self.rawdata)
+        self.rawdata = self.rawdata[:self.n]
+        self.data = list(set([d[0] for d in self.rawdata]))
 
     def store_data(self):
         logger.info('存储')
         store_tuijian_history(self.uid, self.data)
 
     def __call__(self, *args, **kwargs):
-        return self.data, self.rawdata
+        c = Counter(r[2] for r in self.rawdata)
+        # 推荐的引擎来源和个数
+        self.rawdata = {'raw': self.rawdata, 'anaylize': c.most_common()}
+        return {'cids': self.data}, self.rawdata
