@@ -18,7 +18,7 @@ class TagBasedEngine(BaseEngine):
 
     @override
     def core_algo(self):
-        result: List[Tuple[int, float]] = []
+        result: List[Tuple[int, float, str]] = []
         # 所有浏览记录里面的tid和要出现几个cid
         c = Counter(self.tracked_tids)
         most_common = c.most_common()
