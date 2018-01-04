@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 from logzero import logger
 # 两个导入不能去掉，因为用到了eval
 from random import shuffle
@@ -9,6 +14,11 @@ from jian.utils import store_tuijian_history
 
 
 class ProcessRecommand():
+    """
+    此类抽象出推荐的整个流程。首先组合过滤器根据各个推荐引擎所占的比重进行推荐并汇总推荐结果。
+    然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
+    此类是一个callable的类，调用可以获得推荐结果。
+    """
 
     def __init__(self, uid, n):
         self.uid = uid
@@ -40,9 +50,11 @@ class ProcessRecommand():
             logger.info(f'n={n}')
             n += lack
             logger.info(f'n+lack={n}')
+            # 调用推荐引擎的构造器
             create_engine_code = f'{cls}({self.uid},{n})'
             logger.info(create_engine_code)
             engine = eval(create_engine_code)
+            # 引擎是一个callable，调用获得推荐结果。
             newdata = engine()
             lack = (n - len(newdata))
             logger.info(f'lack={lack}')

@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 import logging
 
 from django.http import JsonResponse
@@ -12,6 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 def cids_by_uid(request):
+    """
+    用户调用获得推荐
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     n = request.GET.get('n', 20)
     uid, n = trans_int(uid, n)
@@ -26,6 +36,11 @@ def cids_by_uid(request):
 
 
 def jian_history(request):
+    """
+    用户调用获得推荐过的历史记录并分页
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     page_size = request.GET.get('page_size', 10)
     page_no = request.GET.get('page_no', 1)

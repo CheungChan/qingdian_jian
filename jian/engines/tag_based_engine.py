@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 from logzero import logger
 from collections import Counter
 from typing import List, Tuple
@@ -18,6 +23,10 @@ class TagBasedEngine(BaseEngine):
 
     @override
     def core_algo(self):
+        """
+        基于标签，使用标签所占比例进行推荐。
+        :return:
+        """
         result: List[Tuple[int, float, str]] = []
         # 所有浏览记录里面的tid和要出现几个cid
         c = Counter(self.tracked_tids)

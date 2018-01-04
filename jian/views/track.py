@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 import logging
 from datetime import datetime
 
@@ -11,6 +16,11 @@ logger = logging.getLogger(__name__)
 
 
 def track(request):
+    """
+    用户调用存储喜欢内容的动作
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
     uid, cid = trans_int(uid, cid)

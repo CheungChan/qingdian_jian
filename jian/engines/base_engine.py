@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 from logzero import logger
 from typing import List, Tuple
 from abc import abstractmethod, ABCMeta
@@ -10,6 +15,7 @@ from jian.utils import get_trackcids_tracktids, get_track_disscids_diss_tids, ge
 class BaseEngine(metaclass=ABCMeta):
     """
     所有推荐引擎的基类
+    引擎是一个callable，调用获得推荐结果。
     """
 
     @cached_property
@@ -69,7 +75,7 @@ class BaseEngine(metaclass=ABCMeta):
     @abstractmethod
     def core_algo(self) -> List[Tuple[int, float, str]]:
         """
-        算法核心
+        算法核心抽象方法
         :return:
         """
         pass
@@ -87,4 +93,5 @@ class BaseEngine(metaclass=ABCMeta):
         return result
 
     def __call__(self, *args, **kwargs):
+        # 引擎是一个callable，调用获得推荐结果。
         return self.process_recommend()

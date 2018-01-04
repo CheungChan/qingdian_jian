@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 from logzero import logger
 
 from jian import models
@@ -28,6 +33,10 @@ class ContentBasedEngine(BaseEngine):
 
     @override
     def core_algo(self):
+        """
+        使用结巴分词和基于TD-IDF算法，计算内容相似度，进行推荐。
+        :return:
+        """
         result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
         for cid in self.tracked_cids:

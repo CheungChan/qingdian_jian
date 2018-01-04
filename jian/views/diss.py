@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 import logging
 from datetime import datetime
 
@@ -12,6 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 def track_diss(request):
+    """
+    用户调用存储不喜欢内容。
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
     uid, cid = trans_int(uid, cid)
@@ -32,6 +42,11 @@ def track_diss(request):
 
 
 def track_diss_theme(request):
+    """
+    用户调用存储不喜欢主题
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     tid = request.GET.get('tid')
     uid, tid = trans_int(uid, tid)
@@ -51,6 +66,11 @@ def track_diss_theme(request):
 
 
 def diss_list(request):
+    """
+    用户查询不喜欢内容的列表
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     uid, = trans_int(uid)
     if uid is None:
@@ -67,6 +87,11 @@ def diss_list(request):
 
 
 def diss_theme_list(request):
+    """
+    用户查询用户不喜欢主题的列表。
+    :param request:
+    :return:
+    """
     uid = request.GET.get('uid')
     uid, = trans_int(uid)
     if uid is None:

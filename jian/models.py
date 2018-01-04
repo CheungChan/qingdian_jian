@@ -1,8 +1,16 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+
 from typing import Dict
 from django.db import models
 
 
 class ContentsTag(models.Model):
+    """
+    内容标签表
+    """
     content_id = models.IntegerField()
     tag_id = models.IntegerField()
     name = models.CharField(max_length=10)
@@ -12,6 +20,7 @@ class ContentsTag(models.Model):
     class Meta:
         managed = False
         db_table = 'contents_tag'
+
 
     @classmethod
     def get_tids_by_cid(cls, cid):
@@ -47,6 +56,9 @@ class ContentsTag(models.Model):
 
 
 class Contents(models.Model):
+    """
+    内容表
+    """
     id = models.IntegerField(primary_key=True)
     theme_id = models.IntegerField()
     thirdparty_id = models.CharField(max_length=150, blank=True, null=True)
