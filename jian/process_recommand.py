@@ -24,6 +24,12 @@ class ProcessRecommand():
         self.store_data()
 
     def combile_engine_recommad(self):
+        """
+        组合推荐引擎的思路是根据配置文件确定推荐引擎所占的比重，比重总和是1，根据比重求得每个推荐引擎应该推荐的
+        个数。进行推荐，获取推荐的结果的个数，根据实际推荐的个数和应该推荐的个数求出缺少的个数。再下一个引擎推荐
+        之间加上缺少的个数，进行推荐，依次循环。
+        :return:
+        """
         logger.info('组合推荐引擎')
         lack = 0
 
