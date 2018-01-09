@@ -4,7 +4,7 @@
 # @Author  : 陈章
 import logging
 import redis
-
+from functools import wraps
 import pymongo
 
 from qingdian_jian import settings
@@ -58,10 +58,14 @@ def override(f):
 
 
 def log_views(f):
-    logger.info(settings.LOG_BEGIN)
-    r = f()
-    logger.info(settings.LOG_END)
-    return r
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        logger.info(settings.LOG_BEGIN)
+        r = f(*args, **kwargs)
+        logger.info(settings.LOG_END)
+        return r
+
+    return wrapper
 
 
 if __name__ == '__main__':
