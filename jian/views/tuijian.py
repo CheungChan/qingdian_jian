@@ -7,7 +7,7 @@ import logging
 
 from django.http import JsonResponse
 
-from jian.process_recommand import ProcessRecommand
+from jian.process import Process
 from jian.utils import get_jian_history
 from qingdian_jian.utils import trans_int
 
@@ -29,7 +29,7 @@ def cids_by_uid(request):
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
         return JsonResponse(j, safe=False)
-    data, rawdata = ProcessRecommand(uid, n)()
+    data, rawdata = Process(uid, n)()
     j = {'status': 0, 'data': data, 'rawdata': rawdata}
     logger.info(f'jian j= {j}')
     return JsonResponse(j, safe=False)

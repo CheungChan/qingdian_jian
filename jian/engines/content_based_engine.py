@@ -25,9 +25,8 @@ import jieba.posseg as pseg
 class ContentBasedEngine(BaseEngine):
     name = "基于内容的推荐引擎"
 
-    def __init__(self, uid, n):
-        logger.debug(f'创建{self.name}')
-        super(ContentBasedEngine, self).__init__(uid, n)
+    def __init__(self, process, task_count):
+        super(ContentBasedEngine, self).__init__(process, task_count)
 
     @override
     def core_algo(self):
@@ -35,26 +34,26 @@ class ContentBasedEngine(BaseEngine):
         使用结巴分词和基于TD-IDF算法，计算内容相似度，进行推荐。
         :return:
         """
-        if self.len_tracked == 0:
+        if self.process.len_tracked == 0:
             return []
         result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
-        for cid in self.tracked_cids:
+        for cid in self.process.tracked_cids:
             d = models.Contents.get_contentstr_list(cid)
             if not d:
                 continue
             else:
                 tracked_id_str[cid] = d.get(cid, '')
         logger.debug(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
-        nocids = self.dissed_cids + self.jianed_cids
-        all_id_str = models.Contents.get_contentstr_list(nocids=nocids)
+        all_id_str = models.Contents.get_contentstr_list(nocids=self.process.fitering_cids)
         # logger.debug(f'所有内容id和内容 all_id_str={all_id_str}')
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():
                 sim = self.str_similarity(str1, str2)
                 if 0.0 < sim < 9.9:
                     result.append((id2, sim, self.__class__.__name__))
-        result = sorted(result, key=lambda cid_sim_engine_tuple: cid_sim_engine_tuple[1], reverse=True)[:self.n]
+        result = sorted(result, key=lambda cid_sim_engine_tuple: cid_sim_engine_tuple[1], reverse=True)[
+                 :self.task_count]
         return result
 
     @classmethod

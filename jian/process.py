@@ -9,7 +9,7 @@ from collections import Counter
 from qingdian_jian.settings import weight
 from math import ceil
 from typing import List
-from jian.utils import store_tuijian_history
+from jian.utils import store_tuijian_history, get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
@@ -17,9 +17,9 @@ from jian.engines.tag_based_engine import TagBasedEngine
 logger = logging.getLogger(__name__)
 
 
-class ProcessRecommand():
+class Process():
     """
-    此类抽象出推荐的整个流程。首先组合过滤器根据各个推荐引擎所占的比重进行推荐并汇总推荐结果。
+    此类抽象出推荐的整个流程,会保存关于此用户的所有状态。首先组合过滤器根据各个推荐引擎所占的比重进行推荐并汇总推荐结果。
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
     此类是一个callable的类，调用可以获得推荐结果。
     """
@@ -28,15 +28,26 @@ class ProcessRecommand():
     def __init__(self, uid, n):
         self.uid = uid
         self.n = n
-        self.dissed_cids = []
-        self.jianed_cids = []
         self.meta = {}
         self.rawdata: List[tuple[int, float, str]] = []  # [(cid,sim,enginename),]
         self.data: List[int] = []
+        self.prepare_prepare_signature_vector()
         self.combile_engine_recommad()
         self.filter_data()
         self.order_data()
         self.store_data()
+
+    def prepare_prepare_signature_vector(self):
+        # 所有被追踪（❤️）的内容id #所有被追踪（❤️）的标签id
+        self.tracked_cids, self.tracked_tids = get_trackcids_tracktids(self.uid)
+        # 所有不❤️的内容id  # 所有不❤️的标签id
+        self.dissed_cids, self.dissed_tids = get_track_disscids_diss_tids(self.uid)
+        # 所有已推荐过的内容id
+        self.jianed_cids = get_jian_history(self.uid)
+        # 应该过滤的内容id
+        self.fitering_cids = self.dissed_cids + self.jianed_cids
+        self.len_tracked = len(self.tracked_cids)
+        logger.debug(f'uid {self.uid} 找到cids个数 {self.len_tracked}')
 
     def combile_engine_recommad(self):
         """
@@ -51,31 +62,27 @@ class ProcessRecommand():
         for class_name, w in weight.items():
             if w == 0:
                 continue
-            n = ceil(self.n * w)
-            logger.info(f'n={n}')
-            n += lack
-            logger.info(f'n+lack={n}')
+            task_count: int = ceil(self.n * w)
+            task_count += lack
             # 调用推荐引擎的构造器
             self.check_engine_name(class_name)
-            create_engine_code = f'{class_name}({self.uid},{n})'
-            logger.info(create_engine_code)
+            create_engine_code = f'{class_name}(self,{task_count})'
             engine = eval(create_engine_code)
             # 引擎是一个callable，调用获得推荐结果。
-            newdata = engine()
-            lack = (n - len(newdata))
-            logger.info(f'lennewdata={len(newdata)}, lack={lack}')
-            logger.info(f'{class_name}: {newdata}')
+            newdata = engine.recommend()
+            len_new = len(newdata)
+            lack = (task_count - len_new)
+            logger.info(f'引擎得到数据{len_new}条, 缺少={lack}')
+            if len_new > 0:
+                logger.info(f'{class_name}: {newdata}')
             self.rawdata += newdata
-            self.dissed_cids += engine.dissed_cids
-            self.jianed_cids += engine.jianed_cids
 
     def filter_data(self):
         logger.info('过滤')
         # 要过滤的cid
-        no_cids = self.dissed_cids + self.jianed_cids
         rawdata = []
         for cid, sim, engine_name in self.rawdata:
-            if cid not in no_cids:
+            if cid not in self.fitering_cids:
                 rawdata.append((cid, sim, engine_name))
         self.rawdata = rawdata
 

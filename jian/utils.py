@@ -77,10 +77,8 @@ def get_recently_hot_tracked(recent_days=2, limit=20, nocids=None):
         recent_tracked_cids.append(t['cid'])
     c = Counter(recent_tracked_cids)
     most_common = c.most_common(limit)
-    logger.debug(f'最近热门 {most_common}')
     sum_most_common = sum([i[1] for i in most_common])
     cid_sim_list = [(m[0], m[1] / sum_most_common) for m in most_common]
-    logger.debug(f'最近热门程度 {cid_sim_list}')
     return cid_sim_list
 
 

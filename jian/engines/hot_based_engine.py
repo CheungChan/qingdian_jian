@@ -15,9 +15,8 @@ logger = logging.getLogger(__name__)
 class HotBasedEngine(BaseEngine):
     name = '基于热门（流行度）的推荐引擎'
 
-    def __init__(self, uid, n):
-        logger.debug(f'创建{self.name}')
-        super(HotBasedEngine, self).__init__(uid, n)
+    def __init__(self, process, task_count):
+        super(HotBasedEngine, self).__init__(process, task_count)
 
     @override
     def core_algo(self):
@@ -25,7 +24,6 @@ class HotBasedEngine(BaseEngine):
         基于近期热门进行推荐
         :return:
         """
-        nocids = self.jianed_cids + self.dissed_cids
-        cid_sim = get_recently_hot_tracked(limit=self.n, nocids=nocids)
+        cid_sim = get_recently_hot_tracked(limit=self.task_count, nocids=self.process.fitering_cids)
         result = [(cid, sim, self.__class__.__name__) for cid, sim in cid_sim]
         return result
