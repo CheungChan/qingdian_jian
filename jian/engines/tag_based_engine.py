@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
-
-from logzero import logger
+import logging
 from collections import Counter
 from typing import List, Tuple
 
 from jian import models
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
+
+logger = logging.getLogger(__name__)
 
 
 class TagBasedEngine(BaseEngine):

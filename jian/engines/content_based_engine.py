@@ -3,8 +3,7 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
-from logzero import logger
-
+import logging
 from jian import models
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
@@ -15,6 +14,7 @@ import os
 import jieba
 from typing import List, Tuple
 
+logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)

@@ -3,13 +3,15 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
-from logzero import logger
+import logging
 from typing import List, Tuple
 from abc import abstractmethod, ABCMeta
 
 from werkzeug.utils import cached_property
 
 from jian.utils import get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
+
+logger = logging.getLogger(__name__)
 
 
 class BaseEngine(metaclass=ABCMeta):

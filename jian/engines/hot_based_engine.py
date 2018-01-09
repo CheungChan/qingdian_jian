@@ -3,11 +3,13 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
-from logzero import logger
+import logging
 
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
 from jian.utils import get_recently_hot_tracked
+
+logger = logging.getLogger(__name__)
 
 
 class HotBasedEngine(BaseEngine):

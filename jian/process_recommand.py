@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
-
-from logzero import logger
+import logging
 # 两个导入不能去掉，因为用到了eval
 from random import shuffle
 from collections import Counter
@@ -14,6 +13,8 @@ from jian.utils import store_tuijian_history
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessRecommand():

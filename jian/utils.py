@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
-
-from logzero import logger
+import logging
 from datetime import datetime, timedelta
 from collections import Counter
 import pymongo
 
 from qingdian_jian.utils import get_mongo_collection
 
+logger = logging.getLogger(__name__)
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 JIAN_HISTORY_COLLECTION_NAME = 'jian_history'
