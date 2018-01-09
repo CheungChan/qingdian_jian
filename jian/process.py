@@ -105,4 +105,4 @@ class Process():
         c = Counter(r[2] for r in self.rawdata)
         # 推荐的引擎来源和个数
         self.analyze = {'rate': self.rawdata, 'count': c.most_common()}
-        return {'cids': self.data}, self.analyze
+        return {'jids': self.data}, self.analyze
