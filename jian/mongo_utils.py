@@ -15,14 +15,14 @@ TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 JIAN_HISTORY_COLLECTION_NAME = 'jian_history'
 
 
-def store_tuijian_history(uid: int, jian_cids: list):
+def store_tuijian_history(uid: int, jian_cids: list, analyze: dict):
     """
     将推荐过的存储记录，下次不再推荐推荐过的
     :param uid:
     :param jian_cids:
     :return:
     """
-    data = {'uid': uid, 'jids': jian_cids, 'update_time': datetime.now()}
+    data = {'uid': uid, 'jids': jian_cids, 'analyze': analyze, 'update_time': datetime.now()}
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     db.insert_one(data)
     logger.debug(f'存储推荐记录{data}')
@@ -47,8 +47,6 @@ def get_trackcids_tracktids(uid: int):
     for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         trackcids.append(t['cid'])
         tracktids += t['tids']
-    trackcids = list(set(trackcids))
-    tracktids = list(set(tracktids))
     logger.debug(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
     return trackcids, tracktids
 
@@ -60,8 +58,6 @@ def get_track_disscids_diss_tids(uid: int):
     for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         diss_cids.append(d['cid'])
         diss_tids += d['tids']
-    diss_cids = list(set(diss_cids))
-    diss_tids = list(set(diss_tids))
     logger.debug(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
     return diss_cids, diss_tids
 

@@ -7,7 +7,7 @@ import logging
 
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
-from jian.utils import get_recently_hot_tracked
+from jian.mongo_utils import get_recently_hot_tracked
 
 logger = logging.getLogger(__name__)
 

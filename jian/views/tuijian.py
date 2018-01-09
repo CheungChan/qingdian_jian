@@ -8,7 +8,7 @@ import logging
 from django.http import JsonResponse
 
 from jian.process import Process
-from jian.utils import get_jian_history
+from jian.mongo_utils import get_jian_history
 from qingdian_jian.utils import trans_int
 
 TRACK_COLLECTION_NAME = 'jian_track'
