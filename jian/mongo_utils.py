@@ -36,7 +36,7 @@ def get_jian_history(uid: int, begin=None, end=None):
         history += h['jids']
     if begin is not None and end is not None:
         history = history[begin:end]
-    logger.debug(f'获取到推荐过的历史 {history}')
+    logger.debug(f'获取到推荐过的历史长度 {len(history)}')
     return history
 
 
@@ -47,7 +47,7 @@ def get_trackcids_tracktids(uid: int):
     for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         trackcids.append(t['cid'])
         tracktids += t['tids']
-    logger.debug(f'获取到埋点记录trackcids= {trackcids}, trackedtids= {tracktids}')
+    logger.debug(f'len_trackcid= {len(trackcids)}, len_tracktid= {len(tracktids)}')
     return trackcids, tracktids
 
 
@@ -58,7 +58,7 @@ def get_track_disscids_diss_tids(uid: int):
     for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
         diss_cids.append(d['cid'])
         diss_tids += d['tids']
-    logger.debug(f'获取不喜欢记录diss_cids={diss_cids}, diss_tids={diss_tids}')
+    logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
     return diss_cids, diss_tids
 
 
