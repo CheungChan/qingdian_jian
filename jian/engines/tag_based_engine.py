@@ -13,12 +13,10 @@ from qingdian_jian.utils import override
 
 
 class TagBasedEngine(BaseEngine):
-    """
-    基于标签的推荐引擎
-    """
+    name = '基于标签的推荐引擎'
 
     def __init__(self, uid, n):
-        logger.debug('创建基于标签的引擎')
+        logger.debug(f'创建{self.name}')
         super(TagBasedEngine, self).__init__(uid, n)
 
     @override

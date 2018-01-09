@@ -23,12 +23,10 @@ import jieba.posseg as pseg
 
 
 class ContentBasedEngine(BaseEngine):
-    """
-    基于内容的推荐引擎
-    """
+    name = "基于内容的推荐引擎"
 
     def __init__(self, uid, n):
-        logger.debug('创建基于内容的引擎')
+        logger.debug(f'创建{self.name}')
         super(ContentBasedEngine, self).__init__(uid, n)
 
     @override

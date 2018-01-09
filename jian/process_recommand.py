@@ -11,6 +11,9 @@ from qingdian_jian.settings import weight
 from math import ceil
 from typing import List
 from jian.utils import store_tuijian_history
+from jian.engines.content_based_engine import ContentBasedEngine
+from jian.engines.hot_based_engine import HotBasedEngine
+from jian.engines.tag_based_engine import TagBasedEngine
 
 
 class ProcessRecommand():
@@ -19,6 +22,7 @@ class ProcessRecommand():
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
     此类是一个callable的类，调用可以获得推荐结果。
     """
+    engine_name_list = [c.name for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine)]
 
     def __init__(self, uid, n):
         self.uid = uid
@@ -43,7 +47,7 @@ class ProcessRecommand():
         logger.info('组合推荐引擎')
         lack = 0
 
-        for cls, w in weight.items():
+        for class_name, w in weight.items():
             if w == 0:
                 continue
             n = ceil(self.n * w)
@@ -51,14 +55,15 @@ class ProcessRecommand():
             n += lack
             logger.info(f'n+lack={n}')
             # 调用推荐引擎的构造器
-            create_engine_code = f'{cls}({self.uid},{n})'
+            self.check_engine_name(class_name)
+            create_engine_code = f'{class_name}({self.uid},{n})'
             logger.info(create_engine_code)
             engine = eval(create_engine_code)
             # 引擎是一个callable，调用获得推荐结果。
             newdata = engine()
             lack = (n - len(newdata))
             logger.info(f'lack={lack}')
-            logger.info(f'{cls}: {newdata}')
+            logger.info(f'{class_name}: {newdata}')
             self.rawdata += newdata
             self.dissed_cids += engine.dissed_cids
             self.jianed_cids += engine.jianed_cids
@@ -82,6 +87,11 @@ class ProcessRecommand():
     def store_data(self):
         logger.info('存储')
         store_tuijian_history(self.uid, self.data)
+
+    @classmethod
+    def check_engine_name(cls, class_name):
+        if class_name not in cls.engine_name_list:
+            raise Exception(f'引擎比例配置错误，{cls}不存在')
 
     def __call__(self, *args, **kwargs):
         c = Counter(r[2] for r in self.rawdata)

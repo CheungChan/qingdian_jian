@@ -11,12 +11,10 @@ from jian.utils import get_recently_hot_tracked
 
 
 class HotBasedEngine(BaseEngine):
-    """
-    基于热门（流行度）的推荐引擎
-    """
+    name = '基于热门（流行度）的推荐引擎'
 
     def __init__(self, uid, n):
-        logger.debug('创建基于热门（流行度）的引擎')
+        logger.debug(f'创建{self.name}')
         super(HotBasedEngine, self).__init__(uid, n)
 
     @override
