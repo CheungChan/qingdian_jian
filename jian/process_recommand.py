@@ -22,7 +22,7 @@ class ProcessRecommand():
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
     此类是一个callable的类，调用可以获得推荐结果。
     """
-    engine_name_list = [c.name for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine)]
+    engine_name_list = [c.__name__ for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine)]
 
     def __init__(self, uid, n):
         self.uid = uid
@@ -90,8 +90,9 @@ class ProcessRecommand():
 
     @classmethod
     def check_engine_name(cls, class_name):
+        print(cls.engine_name_list)
         if class_name not in cls.engine_name_list:
-            raise Exception(f'引擎比例配置错误，{cls}不存在')
+            raise Exception(f'引擎比例配置错误，{class_name}不存在')
 
     def __call__(self, *args, **kwargs):
         c = Counter(r[2] for r in self.rawdata)
