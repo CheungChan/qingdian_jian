@@ -9,13 +9,14 @@ from datetime import datetime
 from django.http import JsonResponse
 
 from jian import models
-from qingdian_jian.utils import get_mongo_collection, trans_int
+from qingdian_jian.utils import get_mongo_collection, trans_int, log_views
 
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 TRACK_DISS_THEME_COLLECTION_NAME = 'jian_track_diss_theme'
 logger = logging.getLogger(__name__)
 
 
+@log_views
 def track_diss(request):
     """
     用户调用存储不喜欢内容。
@@ -41,6 +42,7 @@ def track_diss(request):
     return JsonResponse(j, safe=False)
 
 
+@log_views
 def track_diss_theme(request):
     """
     用户调用存储不喜欢主题
@@ -65,6 +67,7 @@ def track_diss_theme(request):
     return JsonResponse(j, safe=False)
 
 
+@log_views
 def diss_list(request):
     """
     用户查询不喜欢内容的列表
@@ -86,6 +89,7 @@ def diss_list(request):
     return JsonResponse(j, safe=False)
 
 
+@log_views
 def diss_theme_list(request):
     """
     用户查询用户不喜欢主题的列表。

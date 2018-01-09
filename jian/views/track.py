@@ -9,12 +9,13 @@ from datetime import datetime
 from django.http import JsonResponse
 
 from jian import models
-from qingdian_jian.utils import get_mongo_collection, trans_int
+from qingdian_jian.utils import get_mongo_collection, trans_int, log_views
 
 TRACK_COLLECTION_NAME = 'jian_track'
 logger = logging.getLogger(__name__)
 
 
+@log_views
 def track(request):
     """
     用户调用存储喜欢内容的动作

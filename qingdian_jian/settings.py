@@ -200,3 +200,5 @@ weight = {
     'TagBasedEngine': 0.4,
     'HotBasedEngine': 0.1,
 }
+LOG_BEGIN = '*' * 50
+LOG_END = LOG_BEGIN

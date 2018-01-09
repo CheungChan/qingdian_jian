@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
-
+import logging
 import redis
 
 import pymongo
 
 from qingdian_jian import settings
 
+logger = logging.getLogger(__name__)
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 r = None
 
@@ -54,6 +55,13 @@ def override(f):
     :return:
     """
     return f
+
+
+def log_views(f):
+    logger.info(settings.LOG_BEGIN)
+    r = f()
+    logger.info(settings.LOG_END)
+    return r
 
 
 if __name__ == '__main__':

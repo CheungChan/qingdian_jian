@@ -9,13 +9,14 @@ from django.http import JsonResponse
 
 from jian.process import Process
 from jian.mongo_utils import get_jian_history
-from qingdian_jian.utils import trans_int
+from qingdian_jian.utils import trans_int, log_views
 
 TRACK_COLLECTION_NAME = 'jian_track'
 TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 logger = logging.getLogger(__name__)
 
 
+@log_views
 def cids_by_uid(request):
     """
     用户调用获得推荐
@@ -35,6 +36,7 @@ def cids_by_uid(request):
     return JsonResponse(j, safe=False)
 
 
+@log_views
 def jian_history(request):
     """
     用户调用获得推荐过的历史记录并分页
