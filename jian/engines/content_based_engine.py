@@ -44,16 +44,15 @@ class ContentBasedEngine(BaseEngine):
                 continue
             else:
                 tracked_id_str[cid] = d.get(cid, '')
-        logger.debug(f'去掉不含描述的内容后 tracked_id_str={tracked_id_str}')
         all_id_str = models.Contents.get_contentstr_list(nocids=self.process.fitering_cids)
-        # logger.debug(f'所有内容id和内容 all_id_str={all_id_str}')
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():
                 sim = self.str_similarity(str1, str2)
                 if 0.0 < sim < 9.9:
                     result.append((id2, sim, self.__class__.__name__))
-        result = sorted(result, key=lambda cid_sim_engine_tuple: cid_sim_engine_tuple[1], reverse=True)[
-                 :self.task_count]
+        result = sorted(result,
+                        key=lambda cid_sim_engine_tuple: cid_sim_engine_tuple[1],
+                        reverse=True)[:self.task_count]
         return result
 
     @classmethod
