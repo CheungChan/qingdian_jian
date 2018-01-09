@@ -71,8 +71,8 @@ class BaseEngine(metaclass=ABCMeta):
         生成用户特征向量
         :return:
         """
-        self.len_tracked = len(self.tracked_tids)
-        logger.debug(f'uid {self.uid} 找到tids个数 {self.len_tracked}')
+        self.len_tracked = len(self.tracked_cids)
+        logger.debug(f'uid {self.uid} 找到cids个数 {self.len_tracked}')
 
     @abstractmethod
     def core_algo(self) -> List[Tuple[int, float, str]]:
@@ -87,11 +87,7 @@ class BaseEngine(metaclass=ABCMeta):
         推荐内容
         :return:
         """
-        result: List[Tuple[int, float, str]] = []
-        if self.len_tracked == 0:
-            pass
-        else:
-            result = self.core_algo()
+        result = self.core_algo()
         return result
 
     def __call__(self, *args, **kwargs):

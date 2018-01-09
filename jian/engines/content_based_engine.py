@@ -35,6 +35,8 @@ class ContentBasedEngine(BaseEngine):
         使用结巴分词和基于TD-IDF算法，计算内容相似度，进行推荐。
         :return:
         """
+        if self.len_tracked == 0:
+            return []
         result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
         for cid in self.tracked_cids:

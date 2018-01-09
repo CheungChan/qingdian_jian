@@ -45,7 +45,7 @@ class ProcessRecommand():
         之间加上缺少的个数，进行推荐，依次循环。
         :return:
         """
-        logger.info('组合推荐引擎')
+        logger.info(f'组合推荐引擎self.n={self.n}')
         lack = 0
 
         for class_name, w in weight.items():
@@ -63,7 +63,7 @@ class ProcessRecommand():
             # 引擎是一个callable，调用获得推荐结果。
             newdata = engine()
             lack = (n - len(newdata))
-            logger.info(f'lack={lack}')
+            logger.info(f'lennewdata={len(newdata)}, lack={lack}')
             logger.info(f'{class_name}: {newdata}')
             self.rawdata += newdata
             self.dissed_cids += engine.dissed_cids
@@ -91,7 +91,6 @@ class ProcessRecommand():
 
     @classmethod
     def check_engine_name(cls, class_name):
-        print(cls.engine_name_list)
         if class_name not in cls.engine_name_list:
             raise Exception(f'引擎比例配置错误，{class_name}不存在')
 
