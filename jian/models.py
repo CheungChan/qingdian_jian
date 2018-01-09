@@ -21,7 +21,6 @@ class ContentsTag(models.Model):
         managed = False
         db_table = 'contents_tag'
 
-
     @classmethod
     def get_tids_by_cid(cls, cid):
         """
@@ -78,6 +77,7 @@ class Contents(models.Model):
     class Meta:
         managed = False
         db_table = 'contents'
+        ordering = ['-updated_at']
 
     @classmethod
     def get_contentstr_list(cls, cid=None, nocids=None) -> Dict:
