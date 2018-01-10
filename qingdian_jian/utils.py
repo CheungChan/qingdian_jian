@@ -3,6 +3,7 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 import logging
+import time
 import redis
 from functools import wraps
 import pymongo
@@ -60,9 +61,11 @@ def override(f):
 def log_views(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        start = time.time()
         logger.info(settings.LOG_BEGIN)
         r = f(*args, **kwargs)
-        logger.info(settings.LOG_END)
+        end = time.time()
+        logger.info(settings.LOG_END + f' at {end-start}s')
         return r
 
     return wrapper
