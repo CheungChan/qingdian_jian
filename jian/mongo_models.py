@@ -1,0 +1,163 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# @Time    : 2018/1/4 17:27
+# @Author  : 陈章
+import logging
+from collections import Counter
+from datetime import datetime, timedelta
+from typing import List, Dict
+
+import pymongo
+
+from jian import models
+from qingdian_jian.utils import get_mongo_collection
+
+logger = logging.getLogger(__name__)
+
+
+class JianTrack:
+    collection_name = 'jian_track'
+
+    @classmethod
+    def get_trackcids_tracktids(cls, uid: int):
+        """
+        获取track（喜欢）过的内容id和标签id
+        :param uid:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        trackcids = []
+        tracktids = []
+        for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
+            trackcids.append(t['cid'])
+            tracktids += t['tids']
+        logger.debug(f'len_trackcid= {len(trackcids)}, len_tracktid= {len(tracktids)}')
+        return trackcids, tracktids
+
+    @classmethod
+    def get_recently_hot_tracked(cls, recent_days: int = 2, limit: int = 20, nocids: List[int] = None):
+        """
+        获取最近热门的track。
+        :param recent_days:
+        :param limit:
+        :param nocids: 要排除的内容id
+        :return:
+        """
+        recent = datetime.now() - timedelta(days=recent_days)
+        if nocids is None:
+            nocids = []
+        db = get_mongo_collection(cls.collection_name)
+        recent_tracked_cids = []
+        curor = db.find({'update_time': {'$gte': recent}, 'cid': {'$nin': nocids}}).sort('update_time',
+                                                                                         pymongo.DESCENDING)
+        for t in curor:
+            recent_tracked_cids.append(t['cid'])
+        c = Counter(recent_tracked_cids)
+        most_common = c.most_common(limit)
+        sum_most_common = sum([i[1] for i in most_common])
+        cid_sim_list = [(m[0], m[1] / sum_most_common) for m in most_common]
+        return cid_sim_list
+
+    @classmethod
+    def store_track_cid(cls, uid: int, cid: int):
+        """
+        保存埋点结果cid
+        :param uid:
+        :param cid:
+        :return:
+        """
+        tags = models.ContentsTag.get_tids_by_cid(cid)
+        db = get_mongo_collection(cls.collection_name)
+        data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now()}
+        db.insert_one(data)
+        logger.info(f'track data={data}')
+
+
+class JianTrackDiss:
+    collection_name = 'jian_track_diss'
+
+    @classmethod
+    def get_track_disscids_diss_tids(cls, uid: int):
+        """
+        获取不喜欢的内容id和标签id,不去重。如果要去重，请处理返回值。
+        :param uid:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        diss_cids = []
+        diss_tids = []
+        for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
+            diss_cids.append(d['cid'])
+            diss_tids += d['tids']
+        logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
+        return diss_cids, diss_tids
+
+    @classmethod
+    def store_diss_cid(cls, uid: int, cid: int):
+        """
+        保存不喜欢的内容id
+        :param uid:
+        :param cid:
+        :return:
+        """
+        data = {'uid': uid, 'cid': cid}
+        db = get_mongo_collection(cls.collection_name)
+        if db.count(data) == 0:
+            tags = models.ContentsTag.get_tids_by_cid(cid)
+            data.update({'tids': tags, 'update_time': datetime.now()})
+            db.insert_one(data)
+            logger.info(f'插入，track_diss data={data}')
+        else:
+            logger.error(f'已存在， track_diss data={data}')
+
+    @classmethod
+    def store_diss_tid(cls, uid: int, tid: int):
+        """
+        保存不喜欢的标签id
+        :param uid:
+        :param tid:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        data = {'uid': uid, 'tid': tid}
+        if db.count(data) == 0:
+            data.update({'update_time': datetime.now()})
+            db.insert_one(data)
+            logger.info(f'插入，track_diss_theme data={data}')
+        else:
+            logger.error(f'已存在， track_diss_theme data={data}')
+
+
+class JianHistory:
+    collection_name = 'jian_history'
+
+    @classmethod
+    def store_tuijian_history(cls, uid: int, jian_cids: List[int], analyze: Dict):
+        """
+        将推荐过的存储记录，下次不再推荐推荐过的
+        :param uid:
+        :param jian_cids:
+        :return:
+        """
+        data = {'uid': uid, 'jids': jian_cids, 'analyze': analyze, 'update_time': datetime.now()}
+        db = get_mongo_collection(cls.collection_name)
+        db.insert_one(data)
+
+    @classmethod
+    def get_jian_history(cls, uid: int, begin: int = None, end: int = None):
+        """
+        获取推荐历史
+        :param uid:
+        :param begin:
+        :param end:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        history = []
+        hs = db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING)
+        for h in hs:
+            history += h['jids']
+        if begin is not None and end is not None:
+            history = history[begin:end]
+        logger.debug(f'获取到推荐过的历史长度 {len(history)}')
+        return history

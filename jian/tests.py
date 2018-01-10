@@ -6,6 +6,7 @@
 import re
 import sys
 from math import sqrt
+
 import jieba
 from logzero import logger
 

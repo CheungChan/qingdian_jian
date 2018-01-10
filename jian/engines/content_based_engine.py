@@ -4,15 +4,17 @@
 # @Author  : 陈章
 
 import logging
-from jian import models
-from jian.engines.base_engine import BaseEngine
-from qingdian_jian.utils import override
+import os
 import re
 from functools import lru_cache
 from math import sqrt
-import os
-import jieba
 from typing import List, Tuple
+
+import jieba
+
+from jian import models
+from jian.engines.base_engine import BaseEngine
+from qingdian_jian.utils import override
 
 logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))

@@ -3,17 +3,16 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 import logging
-# 两个导入不能去掉，因为用到了eval
-from random import shuffle
 from collections import Counter
-from qingdian_jian.settings import weight
 from math import ceil
+from random import shuffle
 from typing import List, Tuple
-from jian.mongo_utils import store_tuijian_history, get_trackcids_tracktids, get_track_disscids_diss_tids, \
-    get_jian_history
+
+from jian import mongo_models
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
+from qingdian_jian.settings import weight
 
 logger = logging.getLogger(__name__)
 
@@ -40,11 +39,11 @@ class Process:
 
     def prepare_prepare_signature_vector(self):
         # 所有被追踪（❤️）的内容id #所有被追踪（❤️）的标签id
-        self.tracked_cids, self.tracked_tids = get_trackcids_tracktids(self.uid)
+        self.tracked_cids, self.tracked_tids = mongo_models.JianTrack.get_trackcids_tracktids(self.uid)
         # 所有不❤️的内容id  # 所有不❤️的标签id
-        self.dissed_cids, self.dissed_tids = get_track_disscids_diss_tids(self.uid)
+        self.dissed_cids, self.dissed_tids = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(self.uid)
         # 所有已推荐过的内容id
-        self.jianed_cids = get_jian_history(self.uid)
+        self.jianed_cids = mongo_models.JianHistory.get_jian_history(self.uid)
         # 应该过滤的内容id
         self.fitering_cids = self.dissed_cids + self.jianed_cids
         self.len_tracked = len(self.tracked_cids)
@@ -98,7 +97,7 @@ class Process:
 
     def store_data(self):
         logger.info('存储')
-        store_tuijian_history(self.uid, self.data, self.analyze)
+        mongo_models.JianHistory.store_tuijian_history(self.uid, self.data, self.analyze)
 
     @classmethod
     def check_engine_name(cls, class_name):

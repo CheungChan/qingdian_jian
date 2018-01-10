@@ -5,9 +5,9 @@
 
 import logging
 
+from jian import mongo_models
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
-from jian.mongo_utils import get_recently_hot_tracked
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ class HotBasedEngine(BaseEngine):
         基于近期热门进行推荐
         :return:
         """
-        cid_sim = get_recently_hot_tracked(limit=self.task_count, nocids=self.process.fitering_cids)
+        cid_sim = mongo_models.JianTrack.get_recently_hot_tracked(limit=self.task_count,
+                                                                  nocids=self.process.fitering_cids)
         result = [(cid, sim, self.__class__.__name__) for cid, sim in cid_sim]
         return result

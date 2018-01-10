@@ -7,8 +7,8 @@ import logging
 
 from django.http import JsonResponse
 
+from jian import mongo_models
 from jian.process import Process
-from jian.mongo_utils import get_jian_history
 from qingdian_jian.utils import trans_int, log_views
 
 TRACK_COLLECTION_NAME = 'jian_track'
@@ -53,7 +53,7 @@ def jian_history(request):
         return JsonResponse(j, safe=False)
     begin = page_size * (page_no - 1)
     end = begin + page_size + 1
-    history = get_jian_history(uid, begin, end)
+    history = mongo_models.JianHistory.get_jian_history(uid, begin, end)
     logger.info(f'{uid} 获取推荐历史 history= {history}')
     j = {'status': 0, 'data': history}
     return JsonResponse(j, safe=True)
