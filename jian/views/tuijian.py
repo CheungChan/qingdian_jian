@@ -11,8 +11,6 @@ from jian import mongo_models
 from jian.process import Process
 from qingdian_jian.utils import trans_int, log_views
 
-TRACK_COLLECTION_NAME = 'jian_track'
-TRACK_DISS_COLLECTION_NAME = 'jian_track_diss'
 logger = logging.getLogger(__name__)
 
 

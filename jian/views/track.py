@@ -10,7 +10,6 @@ from django.http import JsonResponse
 from jian import mongo_models
 from qingdian_jian.utils import trans_int, log_views
 
-TRACK_COLLECTION_NAME = 'jian_track'
 logger = logging.getLogger(__name__)
 
 
