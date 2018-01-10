@@ -8,7 +8,7 @@ from random import shuffle
 from collections import Counter
 from qingdian_jian.settings import weight
 from math import ceil
-from typing import List
+from typing import List, Tuple
 from jian.mongo_utils import store_tuijian_history, get_trackcids_tracktids, get_track_disscids_diss_tids, \
     get_jian_history
 from jian.engines.content_based_engine import ContentBasedEngine
@@ -18,7 +18,7 @@ from jian.engines.tag_based_engine import TagBasedEngine
 logger = logging.getLogger(__name__)
 
 
-class Process():
+class Process:
     """
     此类抽象出推荐的整个流程,会保存关于此用户的所有状态。首先组合过滤器根据各个推荐引擎所占的比重进行推荐并汇总推荐结果。
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
@@ -30,7 +30,7 @@ class Process():
         self.uid = uid
         self.n = n
         self.meta = {}
-        self.rawdata: List[tuple[int, float, str]] = []  # [(cid,sim,enginename),]
+        self.rawdata: List[Tuple[int, float, str]] = []  # [(cid,sim,enginename),]
         self.data: List[int] = []
         self.prepare_prepare_signature_vector()
         self.combile_engine_recommad()
