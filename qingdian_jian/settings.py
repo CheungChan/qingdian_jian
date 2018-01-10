@@ -164,7 +164,7 @@ LOGGING = {
     },
     'formatters': {
         'standard': {
-            'format': '(%(asctime)s) [%(name)s.%(funcName)s:%(lineno)d] [%(levelname)s]: %(message)s'},
+            'format': '%(asctime)s [%(levelname)s] [%(name)s:%(lineno)d] %(message)s'},
     },
     'loggers': {
         'jian': {
@@ -209,5 +209,5 @@ weight = {
     'TagBasedEngine': 0.4,
     'HotBasedEngine': 0.1,
 }
-LOG_BEGIN = 'REQUEST BEGIN' + '*' * 100
+LOG_BEGIN = 'REQUEST BEGIN' + '*' * 70
 LOG_END = 'REQUEST END'
