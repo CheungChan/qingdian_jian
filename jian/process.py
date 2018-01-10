@@ -9,7 +9,8 @@ from collections import Counter
 from qingdian_jian.settings import weight
 from math import ceil
 from typing import List
-from jian.mongo_utils import store_tuijian_history, get_trackcids_tracktids, get_track_disscids_diss_tids, get_jian_history
+from jian.mongo_utils import store_tuijian_history, get_trackcids_tracktids, get_track_disscids_diss_tids, \
+    get_jian_history
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
@@ -93,7 +94,7 @@ class Process():
         self.data = list(set([d[0] for d in self.rawdata]))
         c = Counter(r[2] for r in self.rawdata)
         # 推荐的引擎来源和个数
-        self.analyze = {'rate': self.rawdata, 'count': c.most_common()}
+        self.analyze = {'rate': self.rawdata, 'every_count': c.most_common(), 'counts': len(self.rawdata)}
 
     def store_data(self):
         logger.info('存储')
