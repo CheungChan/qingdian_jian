@@ -25,7 +25,6 @@ def store_tuijian_history(uid: int, jian_cids: list, analyze: dict):
     data = {'uid': uid, 'jids': jian_cids, 'analyze': analyze, 'update_time': datetime.now()}
     db = get_mongo_collection(JIAN_HISTORY_COLLECTION_NAME)
     db.insert_one(data)
-    logger.debug(f'存储推荐记录{data}')
 
 
 def get_jian_history(uid: int, begin=None, end=None):
