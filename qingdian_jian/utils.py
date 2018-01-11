@@ -63,10 +63,10 @@ def log_views(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time.time()
-        logger.info(settings.LOG_BEGIN)
+        logger.info(f.__name__ + settings.LOG_BEGIN)
         r = f(*args, **kwargs)
         end = time.time()
-        logger.info(settings.LOG_END + f' at {end-start}s')
+        logger.info(f.__name__ + settings.LOG_END + f' at {end-start}s')
         return r
 
     return wrapper
