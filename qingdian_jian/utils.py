@@ -4,9 +4,10 @@
 # @Author  : 陈章
 import logging
 import time
-import redis
 from functools import wraps
+
 import pymongo
+import redis
 
 from qingdian_jian import settings
 

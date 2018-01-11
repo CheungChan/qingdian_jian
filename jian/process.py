@@ -105,4 +105,4 @@ class Process:
             raise Exception(f'引擎比例配置错误，{class_name}不存在')
 
     def __call__(self, *args, **kwargs):
-        return {'jids': self.data}, self.analyze
+        return {'jids': self.data, 'uid': self.uid}, self.analyze
