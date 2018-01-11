@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 class JianTrack:
     collection_name = 'jian_track'
 
+    # uid: xx cid: xx tids: [xx,yy] update_time: xx
+
     @classmethod
     def get_trackcids_tracktids(cls, uid: int):
         """
@@ -76,6 +78,8 @@ class JianTrack:
 class JianTrackDiss:
     collection_name = 'jian_track_diss'
 
+    # uid:xx cid:xx tids:[xx,yy]
+
     @classmethod
     def get_track_disscids_diss_tids(cls, uid: int):
         """
@@ -87,7 +91,9 @@ class JianTrackDiss:
         diss_cids = []
         diss_tids = []
         for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
-            diss_cids.append(d['cid'])
+            cid = d.get('cid')
+            if cid:
+                diss_cids.append(cid)
             diss_tids += d['tids']
         logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
         return diss_cids, diss_tids
@@ -119,7 +125,7 @@ class JianTrackDiss:
         :return:
         """
         db = get_mongo_collection(cls.collection_name)
-        data = {'uid': uid, 'tid': tid}
+        data = {'uid': uid, 'tids': [tid, ]}
         if db.count(data) == 0:
             data.update({'update_time': datetime.now()})
             db.insert_one(data)
@@ -130,6 +136,8 @@ class JianTrackDiss:
 
 class JianHistory:
     collection_name = 'jian_history'
+
+    # uid:xx jian_cids:xx analyze:xx
 
     @classmethod
     def store_tuijian_history(cls, uid: int, jian_cids: List[int], analyze: Dict):
