@@ -164,7 +164,7 @@ LOGGING = {
     },
     'formatters': {
         'standard': {
-            'format': '%(asctime)s [%(levelname)s] [%(name)s:%(lineno)d] %(message)s'},
+            'format': '%(asctime)s [%(levelname)s] p:%(process)s [%(name)s:%(lineno)d] %(message)s'},
     },
     'loggers': {
         'jian': {
