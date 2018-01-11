@@ -30,7 +30,7 @@ def cids_by_uid(request):
         return JsonResponse(j, safe=False)
     data, analyze = Process(uid, n)()
     j = {'status': 0, 'data': data, 'analyze': analyze}
-    logger.info(f'jian j= {j}')
+    logger.info(f'>>> jian j= {j}')
     return JsonResponse(j, safe=False)
 
 
