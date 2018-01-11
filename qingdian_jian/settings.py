@@ -209,5 +209,5 @@ weight = {
     'TagBasedEngine': 0.4,
     'HotBasedEngine': 0.1,
 }
-LOG_BEGIN = '  REQUEST BEGIN' + '*' * 70
-LOG_END = '  REQUEST END'
+LOG_BEGIN = '  REQUEST BEGIN' + '+' * 70
+LOG_END = '  REQUEST END' + '-' * 70
