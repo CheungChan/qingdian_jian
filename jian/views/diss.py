@@ -22,11 +22,15 @@ def track_diss(request):
     """
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
-    uid, cid = trans_int(uid, cid)
-    if uid is None or cid is None:
-        j = {'status': -1, 'data': []}
+    client = request.GET.get('client', 0)
+    device_id = request.GET.get('device_id', 0)
+    behavior = request.GET.get('behavior', 0)
+    uid, cid, client, behavior, device_id = trans_int(uid, cid, client, behavior, device_id)
+    if any((x is None for x in [uid, cid, client, behavior, device_id])):
+        j = {'status': -1, 'msg': '参数传递非法', 'query': request.GET}
+        logger.error(j)
         return JsonResponse(j, safe=False)
-    mongo_models.JianTrackDiss.store_diss_cid(uid, cid)
+    mongo_models.JianTrackDiss.store_diss_cid(uid, cid, client, behavior, device_id)
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
 
@@ -40,11 +44,14 @@ def track_diss_theme(request):
     """
     uid = request.GET.get('uid')
     tid = request.GET.get('tid')
-    uid, tid = trans_int(uid, tid)
-    if uid is None or tid is None:
-        j = {'status': -1, 'data': []}
+    client = request.GET.get('client', 0)
+    device_id = request.GET.get('device_id', 0)
+    uid, tid, client, device_id = trans_int(uid, tid, client, device_id)
+    if any((x is None for x in [uid, tid, client, device_id])):
+        j = {'status': -1, 'msg': '参数传递非法', 'query': request.GET}
+        logger.error(j)
         return JsonResponse(j, safe=False)
-    mongo_models.JianTrackDiss.store_diss_tid(uid, tid)
+    mongo_models.JianTrackDiss.store_diss_tid(uid, tid, client, device_id)
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
 
@@ -60,6 +67,7 @@ def diss_list(request):
     uid, = trans_int(uid)
     if uid is None:
         j = {'status': -1, 'data': []}
+        logger.error(j)
         return JsonResponse(j, safe=False)
     records = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(uid)[0]
     records = list(set(records))
@@ -79,6 +87,7 @@ def diss_theme_list(request):
     uid, = trans_int(uid)
     if uid is None:
         j = {'status': -1, 'data': []}
+        logger.error(j)
         return JsonResponse(j, safe=False)
     records = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(uid)[1]
     records = list(set(records))

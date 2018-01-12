@@ -27,6 +27,7 @@ def cids_by_uid(request):
     logger.info(f'访问cids_by_uid?uid={uid}&n={n}')
     if uid is None or n is None:
         j = {'status': -1, 'data': []}
+        logger.error(j)
         return JsonResponse(j, safe=False)
     data, analyze = Process(uid, n)()
     j = {'status': 0, 'data': data, 'analyze': analyze}
@@ -48,6 +49,7 @@ def jian_history(request):
     logger.info(f'访问jian_history?uid={uid}&page_size={page_size}&page_no={page_no}')
     if page_size is None or page_no is None:
         j = {'status': -1, 'data': []}
+        logger.error(j)
         return JsonResponse(j, safe=False)
     begin = page_size * (page_no - 1)
     end = begin + page_size + 1

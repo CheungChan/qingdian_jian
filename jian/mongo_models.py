@@ -61,16 +61,14 @@ class JianTrack:
         return cid_sim_list
 
     @classmethod
-    def store_track_cid(cls, uid: int, cid: int):
+    def store_track_cid(cls, uid: int, cid: int, client: int, behavior: int, device_id: str):
         """
         保存埋点结果cid
-        :param uid:
-        :param cid:
-        :return:
         """
         tags = models.ContentsTag.get_tids_by_cid(cid)
         db = get_mongo_collection(cls.collection_name)
-        data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now()}
+        data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now(), 'client': client,
+                'device_id': device_id, 'behavior': behavior}
         db.insert_one(data)
         logger.info(f'track data={data}')
 
@@ -99,14 +97,11 @@ class JianTrackDiss:
         return diss_cids, diss_tids
 
     @classmethod
-    def store_diss_cid(cls, uid: int, cid: int):
+    def store_diss_cid(cls, uid: int, cid: int, client: int, behavior: int, device_id: str):
         """
         保存不喜欢的内容id
-        :param uid:
-        :param cid:
-        :return:
         """
-        data = {'uid': uid, 'cid': cid}
+        data = {'uid': uid, 'cid': cid, 'client': client, 'device_id': device_id, 'behavior': behavior}
         db = get_mongo_collection(cls.collection_name)
         if db.count(data) == 0:
             tags = models.ContentsTag.get_tids_by_cid(cid)
@@ -117,15 +112,12 @@ class JianTrackDiss:
             logger.error(f'已存在， track_diss data={data}')
 
     @classmethod
-    def store_diss_tid(cls, uid: int, tid: int):
+    def store_diss_tid(cls, uid: int, tid: int, client: int, device_id: int):
         """
         保存不喜欢的标签id
-        :param uid:
-        :param tid:
-        :return:
         """
         db = get_mongo_collection(cls.collection_name)
-        data = {'uid': uid, 'tids': [tid, ]}
+        data = {'uid': uid, 'tids': [tid, ], 'client': client, 'device_id': device_id}
         if db.count(data) == 0:
             data.update({'update_time': datetime.now()})
             db.insert_one(data)

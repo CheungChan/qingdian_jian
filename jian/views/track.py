@@ -22,10 +22,14 @@ def track(request):
     """
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
-    uid, cid = trans_int(uid, cid)
-    if uid is None or cid is None:
-        j = {'status': -1, 'data': []}
+    client = request.GET.get('client', 0)
+    device_id = request.GET.get('device_id', 0)
+    behavior = request.GET.get('behavior', 0)
+    uid, cid, client, behavior = trans_int(uid, cid, client, behavior)
+    if any((x is None for x in [uid, cid, client, behavior, device_id])):
+        j = {'status': -1, 'msg': '参数传递非法'}
+        logger.error(j)
         return JsonResponse(j, safe=False)
-    mongo_models.JianTrack.store_track_cid(uid, cid)
+    mongo_models.JianTrack.store_track_cid(uid, cid, client, behavior, device_id)
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
