@@ -1,36 +1,22 @@
-import math
-
-from django.http import HttpResponse
-from django.template import loader
-from pyecharts import Line3D
-
-from pyecharts.constants import DEFAULT_HOST
+from django.http import JsonResponse
+from django.shortcuts import render
+from kan import mongo_models
+from datetime import datetime, timedelta
+from qingdian_jian.utils import trans_int, MongoDocEncoder
 
 
 def index(request):
-    template = loader.get_template('kan/pyecharts.html')
-    l3d = line3d()
-    context = dict(
-        myechart=l3d.render_embed(),
-        host=DEFAULT_HOST,
-        script_list=l3d.get_js_dependencies()
-    )
-    return HttpResponse(template.render(context, request))
-
-
-def line3d():
-    _data = []
-    for t in range(0, 25000):
-        _t = t / 1000
-        x = (1 + 0.25 * math.cos(75 * _t)) * math.cos(_t)
-        y = (1 + 0.25 * math.cos(75 * _t)) * math.sin(_t)
-        z = _t + 2.0 * math.sin(75 * _t)
-        _data.append([x, y, z])
-    range_color = [
-        '#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf',
-        '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-    line3d = Line3D("3D line plot demo", width=1200, height=600)
-    line3d.add("", _data, is_visualmap=True,
-               visual_range_color=range_color, visual_range=[0, 30],
-               is_grid3D_rotate=True, grid3D_rotate_speed=180)
-    return line3d
+    datetime_range = request.GET.get('datetime_range', '')
+    if datetime_range:
+        from_datetime, end_datetime = datetime_range.split(' - ')
+        from_datetime = datetime.strptime(from_datetime, '%Y-%m-%d %H:%M:%S')
+        end_datetime = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M:%S')
+    else:
+        from_datetime = datetime.now() - timedelta(days=7)
+        end_datetime = datetime.now()
+    jianed_cids, tracked_cids, dissed_cids = mongo_models.Statistics.get_data(from_datetime, end_datetime)
+    len_jianed_cids = len(jianed_cids)
+    len_tracked_cids = len(tracked_cids)
+    len_dissed_cids = len(dissed_cids)
+    len_nothing_cids = len_jianed_cids - len_tracked_cids - len_dissed_cids
+    return render(request, 'kan/index.html', locals())

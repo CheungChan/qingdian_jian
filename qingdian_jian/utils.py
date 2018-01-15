@@ -4,9 +4,11 @@
 # @Author  : 陈章
 import logging
 import time
+import json
 from functools import wraps
-
+from datetime import datetime
 import pymongo
+from bson.objectid import ObjectId
 import redis
 
 from qingdian_jian import settings
@@ -73,6 +75,15 @@ def log_views(f):
         return r
 
     return wrapper
+
+
+class MongoDocEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 
 if __name__ == '__main__':

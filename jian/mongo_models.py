@@ -72,6 +72,18 @@ class JianTrack:
         db.insert_one(data)
         logger.info(f'track data={data}')
 
+    @classmethod
+    def statistics_rencent_tracked_docs(cls, from_datetime: datetime, end_datetime: datetime):
+        """
+        统计一定时间范围内的喜欢的内容id
+        :param from_datetime:
+        :param end_datetime:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
+
 
 class JianTrackDiss:
     collection_name = 'jian_track_diss'
@@ -125,6 +137,18 @@ class JianTrackDiss:
         else:
             logger.error(f'已存在， track_diss_theme data={data}')
 
+    @classmethod
+    def statistics_rencent_dissed_docs(cls, from_datetime: datetime, end_datetime: datetime):
+        """
+        统计一定时间范围内的不喜欢的内容id
+        :param from_datetime:
+        :param end_datetime:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
+
 
 class JianHistory:
     collection_name = 'jian_history'
@@ -161,3 +185,15 @@ class JianHistory:
             history = history[begin:end]
         logger.debug(f'获取到推荐过的历史长度 {len(history)}')
         return history
+
+    @classmethod
+    def statistics_rencent_jianed_docs(cls, from_datetime: int = 7, end_datetime: int = 0):
+        """
+        统计一定时间范围内的推荐历史
+        :param from_datetime:
+        :param end_datetime:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
