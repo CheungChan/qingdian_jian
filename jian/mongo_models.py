@@ -97,11 +97,11 @@ class JianTrackDiss:
         return diss_cids, diss_tids
 
     @classmethod
-    def store_diss_cid(cls, uid: int, cid: int, client: int, behavior: int, device_id: str):
+    def store_diss_cid(cls, uid: int, cid: int, client: int, device_id: str):
         """
         保存不喜欢的内容id
         """
-        data = {'uid': uid, 'cid': cid, 'client': client, 'device_id': device_id, 'behavior': behavior}
+        data = {'uid': uid, 'cid': cid, 'client': client, 'device_id': device_id}
         db = get_mongo_collection(cls.collection_name)
         if db.count(data) == 0:
             tags = models.ContentsTag.get_tids_by_cid(cid)

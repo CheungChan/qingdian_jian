@@ -24,13 +24,12 @@ def track_diss(request):
     cid = request.GET.get('cid')
     client = request.GET.get('client', 0)
     device_id = request.GET.get('device_id', 0)
-    behavior = request.GET.get('behavior', 0)
-    uid, cid, client, behavior, device_id = trans_int(uid, cid, client, behavior, device_id)
-    if any((x is None for x in [uid, cid, client, behavior, device_id])):
+    uid, cid, client, device_id = trans_int(uid, cid, client, device_id)
+    if any((x is None for x in [uid, cid, client, device_id])):
         j = {'status': -1, 'msg': '参数传递非法', 'query': request.GET}
         logger.error(j)
         return JsonResponse(j, safe=False)
-    mongo_models.JianTrackDiss.store_diss_cid(uid, cid, client, behavior, device_id)
+    mongo_models.JianTrackDiss.store_diss_cid(uid, cid, client, device_id)
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
 
