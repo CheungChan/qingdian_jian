@@ -5,9 +5,11 @@
 
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('jian/', include('jian.urls')),
     path('jian/kan/', include('kan.urls')),
 ]
+urlpatterns += staticfiles_urlpatterns()
