@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <title>推荐命中率</title>
+    <script src="{% static "jian/kan/js/echarts.min.js" %}"></script>
+    <script src="{% static "jian/kan/laydate/laydate.js" %}"></script>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{% static "jian/kan/layui/css/layui.css" %}" media="all">
+</head>
+<body>
+<form class="layui-form" action="{% url "kan_index" %}">
+    <div class="layui-form-item">
+        <label class="layui-form-label" for="datetime_range">范围：</label>
+        <div class="layui-input-block">
+            <input type="text" id="datetime_range" name="datetime_range" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" for="client">数据来源</label>
+        <div class="layui-input-block">
+            <input type="radio" name="client" value="" title="所有" checked="">
+            <input type="radio" name="client" value="0" title="未知">
+            <input type="radio" name="client" value="1" title="IOS">
+            <input type="radio" name="client" value="2" title="安卓">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn">查询</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 600px;height:400px;"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: '推荐命中率',
+            subtext: '{{ from_datetime }} ~ {{ end_datetime }}',
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['喜欢', '未表态', '不喜欢']
+        },
+        series: [
+            {
+                name: '推荐命中率',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: [
+                    {value:{{ len_tracked_cids }}, name: '喜欢'},
+                    {value:{{ len_nothing_cids}}, name: '未表态'},
+                    {value:{{ len_dissed_cids }}, name: '不喜欢'}
+                ],
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+
+    //日期时间范围
+    var ins = laydate.render({
+        elem: '#datetime_range',
+        type: 'datetime',
+        max: 0,
+        value: '{{ datetime_range }}',
+        range: true
+        // ready: function () {
+        //     ins.hint('日期可选值设定在今日之前');
+        // }
+    });
+</script>
+</body>
+</html>
