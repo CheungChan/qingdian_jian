@@ -19,4 +19,4 @@ def index(request):
     len_tracked_cids = len(tracked_cids)
     len_dissed_cids = len(dissed_cids)
     len_nothing_cids = len_jianed_cids - len_tracked_cids - len_dissed_cids
-    return render(request, 'kan/index.html', locals())
+    return render(request, 'jian/kan/index.html', locals())
