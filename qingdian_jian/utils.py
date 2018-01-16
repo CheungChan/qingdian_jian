@@ -92,7 +92,52 @@ def filter_cids(cids):
     return list(set(list(filter(lambda x: x not in no_cids, cids))))
 
 
+def type_cast_request_args(request, validates, method='GET'):
+    return_list = []
+    for v in validates:
+        arg_name = v[0]
+        arg_default = v[1]
+        arg_type = v[2]
+
+        if method == 'GET':
+            arg_method = request.GET
+        elif method == 'POST':
+            arg_method = request.POST
+        else:
+            raise Exception('方法只支持GET和POST请求')
+
+        arg = arg_method.get(arg_name, arg_default)
+        if arg is None:
+            arg = arg_default
+        else:
+            try:
+                arg = arg_type(arg)
+            except (ValueError, TypeError) as e:
+                arg = arg_default
+        return_list.append(arg)
+    return return_list
+
+
+class MockRequest:
+    def __init__(self, a, b, c):
+        print('init reqeust')
+        self.GET = dict()
+        self.GET['a'] = a
+        self.GET['b'] = b
+        self.GET['c'] = c
+
+
+def mock_index(request):
+    validates = [('a', 0, int),
+                 ('b', 0.0, float),
+                 ('c', '', str)]
+    a, b, c = type_cast_request_args(request, validates)
+    print(a, b, c)
+    print(type(a), type(b), type(c))
+    return 'hello world'
+
+
 if __name__ == '__main__':
     r = get_redis()
-    # r.set('test_chenzhang','测试',10)
-    # print(r.get('test_chenzhang').decode('utf-8'))
+    request = MockRequest('1', None, None)
+    mock_index(request)

@@ -9,7 +9,7 @@ from django.http import JsonResponse
 
 from jian import mongo_models
 from jian.process import Process
-from qingdian_jian.utils import trans_int, log_views
+from qingdian_jian.utils import type_cast_request_args, log_views
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +21,11 @@ def cids_by_uid(request):
     :param request:
     :return:
     """
-    uid = request.GET.get('uid')
-    n = request.GET.get('n', 20)
-    client = request.GET.get('client', '')
-    device_id = request.GET.get('device_id')
-    uid, n, client = trans_int(uid, n, client)
+    validaters = [('uid', 0, int),
+                  ('n', 0, int),
+                  ('client', 0, int),
+                  ('device_id', None, str)]
+    uid, n, client, device_id = type_cast_request_args(request, validaters)
     if any([x is None for x in (uid, n, client, device_id)]):
         j = {'status': -1, 'msg': '参数传递非法', 'data': []}
         logger.error(j)
@@ -43,10 +43,10 @@ def jian_history(request):
     :param request:
     :return:
     """
-    uid = request.GET.get('uid')
-    page_size = request.GET.get('page_size', 10)
-    page_no = request.GET.get('page_no', 1)
-    uid, page_size, page_no = trans_int(uid, page_size, page_no)
+    validaters = [('uid', 0, int),
+                  ('page_no', 10, int),
+                  ('page_size', 1, int)]
+    uid, page_no, page_size = type_cast_request_args(request, validaters)
     if any([x is None for x in (uid, page_no, page_size)]):
         j = {'status': -1, 'msg': '参数传递非法', 'data': []}
         logger.error(j)
