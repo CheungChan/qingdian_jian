@@ -25,9 +25,11 @@ class Process:
     """
     engine_name_list = [c.__name__ for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine)]
 
-    def __init__(self, uid, n):
+    def __init__(self, uid, n, client, device_id):
         self.uid = uid
         self.n = n
+        self.client = client
+        self.device_id = device_id
         self.meta = {}
         self.rawdata: List[Tuple[int, float, str]] = []  # [(cid,sim,enginename),]
         self.data: List[int] = []
@@ -93,7 +95,8 @@ class Process:
         self.data = list(set([d[0] for d in self.rawdata]))
         c = Counter(r[2] for r in self.rawdata)
         # 推荐的引擎来源和个数
-        self.analyze = {'rate': self.rawdata, 'every_count': c.most_common(), 'counts': len(self.rawdata)}
+        self.analyze = {'rate': self.rawdata, 'every_count': c.most_common(), 'counts': len(self.rawdata),
+                        'client': self.client, 'device_id': self.device_id}
 
     def store_data(self):
         logger.info('存储')

@@ -23,8 +23,8 @@ def track_diss(request):
     uid = request.GET.get('uid')
     cid = request.GET.get('cid')
     client = request.GET.get('client', 0)
-    device_id = request.GET.get('device_id', 0)
-    uid, cid, client, device_id = trans_int(uid, cid, client, device_id)
+    device_id = request.GET.get('device_id')
+    uid, cid, client = trans_int(uid, cid, client)
     if any((x is None for x in [uid, cid, client, device_id])):
         j = {'status': -1, 'msg': '参数传递非法', 'query': request.GET}
         logger.error(j)
@@ -44,8 +44,8 @@ def track_diss_theme(request):
     uid = request.GET.get('uid')
     tid = request.GET.get('tid')
     client = request.GET.get('client', 0)
-    device_id = request.GET.get('device_id', 0)
-    uid, tid, client, device_id = trans_int(uid, tid, client, device_id)
+    device_id = request.GET.get('device_id')
+    uid, tid, client = trans_int(uid, tid, client)
     if any((x is None for x in [uid, tid, client, device_id])):
         j = {'status': -1, 'msg': '参数传递非法', 'query': request.GET}
         logger.error(j)
@@ -85,7 +85,7 @@ def diss_theme_list(request):
     uid = request.GET.get('uid')
     uid, = trans_int(uid)
     if uid is None:
-        j = {'status': -1, 'data': []}
+        j = {'status': -1, 'msg': '参数传递非法', 'data': []}
         logger.error(j)
         return JsonResponse(j, safe=False)
     records = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(uid)[1]

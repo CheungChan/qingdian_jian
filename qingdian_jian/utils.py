@@ -16,6 +16,8 @@ from qingdian_jian import settings
 logger = logging.getLogger(__name__)
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 r = None
+# 无效的cid
+no_cids = [None, 0, 1]
 
 
 def get_redis():
@@ -84,6 +86,10 @@ class MongoDocEncoder(json.JSONEncoder):
         if isinstance(o, datetime):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
+
+def filter_cids(cids):
+    return list(set(list(filter(lambda x: x not in no_cids, cids))))
 
 
 if __name__ == '__main__':

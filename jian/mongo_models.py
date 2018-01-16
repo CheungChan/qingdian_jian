@@ -73,7 +73,7 @@ class JianTrack:
         logger.info(f'track data={data}')
 
     @classmethod
-    def statistics_rencent_tracked_docs(cls, from_datetime: datetime, end_datetime: datetime):
+    def statistics_rencent_tracked_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int):
         """
         统计一定时间范围内的喜欢的内容id
         :param from_datetime:
@@ -82,6 +82,8 @@ class JianTrack:
         """
         db = get_mongo_collection(cls.collection_name)
         condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if client is not None:
+            condition.update({'client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
@@ -138,7 +140,7 @@ class JianTrackDiss:
             logger.error(f'已存在， track_diss_theme data={data}')
 
     @classmethod
-    def statistics_rencent_dissed_docs(cls, from_datetime: datetime, end_datetime: datetime):
+    def statistics_rencent_dissed_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int):
         """
         统计一定时间范围内的不喜欢的内容id
         :param from_datetime:
@@ -147,6 +149,8 @@ class JianTrackDiss:
         """
         db = get_mongo_collection(cls.collection_name)
         condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if client is not None:
+            condition.update({'client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
@@ -187,7 +191,7 @@ class JianHistory:
         return history
 
     @classmethod
-    def statistics_rencent_jianed_docs(cls, from_datetime: int = 7, end_datetime: int = 0):
+    def statistics_rencent_jianed_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int):
         """
         统计一定时间范围内的推荐历史
         :param from_datetime:
@@ -196,4 +200,6 @@ class JianHistory:
         """
         db = get_mongo_collection(cls.collection_name)
         condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if client is not None:
+            condition.update({'analyze.client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))

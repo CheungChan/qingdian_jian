@@ -22,10 +22,14 @@
     <div class="layui-form-item">
         <label class="layui-form-label" for="client">数据来源</label>
         <div class="layui-input-block">
-            <input type="radio" name="client" value="" title="所有" checked="">
-            <input type="radio" name="client" value="0" title="未知">
-            <input type="radio" name="client" value="1" title="IOS">
-            <input type="radio" name="client" value="2" title="安卓">
+            <input type="radio" name="client" value="" style="display: inline-block;"
+                   {% ifequal client None %}checked{% endifequal %}>所有
+            <input type="radio" name="client" value="0" style="display: inline-block; margin-left: 20px"
+                   {% ifequal client 0 %}checked{% endifequal %}>未知
+            <input type="radio" name="client" value="1" style="display: inline-block; margin-left: 20px"
+                   {% ifequal client 1 %}checked{% endifequal %}>IOS
+            <input type="radio" name="client" value="2" style="display: inline-block; margin-left: 20px"
+                   {% ifequal client 2 %}checked{% endifequal %}>安卓
         </div>
     </div>
     <div class="layui-form-item">
