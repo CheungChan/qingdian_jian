@@ -22,7 +22,7 @@ def cids_by_uid(request):
     :return:
     """
     validaters = [('uid', 0, int),
-                  ('n', 0, int),
+                  ('n', 20, int),
                   ('client', 0, int),
                   ('device_id', None, str)]
     uid, n, client, device_id = type_cast_request_args(request, validaters)
