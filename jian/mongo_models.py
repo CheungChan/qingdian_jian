@@ -107,7 +107,7 @@ class JianTrackDiss:
             if cid:
                 diss_cids.append(cid)
             diss_tids += d['tids']
-        logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
+        # logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
         return diss_cids, diss_tids
 
     @classmethod

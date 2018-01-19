@@ -48,9 +48,10 @@ class TagBasedEngine(BaseEngine):
             num += t[1]  # 统计有了多少个标签了
             if num > self.task_count:
                 break
-        else:
-            logger.debug(f'四舍五入少了，加上{self.task_count-num}')
-            tid_num[0][1] += self.task_count - num
+        # 不再对最多的标签加缺少的。
+        # else:
+        #     logger.debug(f'四舍五入少了，加上{self.task_count-num}')
+        #     tid_num[0][1] += self.task_count - num
         logger.debug(f'tid_num= {tid_num}')
         # 获得数据库中tid对应的所有cids
         for tid, limit in tid_num:
