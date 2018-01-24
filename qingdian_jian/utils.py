@@ -15,7 +15,8 @@ from qingdian_jian import settings
 
 logger = logging.getLogger(__name__)
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
-r = None
+r = redis.Redis(connection_pool=pool)
+global_connection = pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
 # 无效的cid
 no_cids = [None, 0, 1]
 
@@ -25,9 +26,6 @@ def get_redis():
     if not r:
         r = redis.Redis(connection_pool=pool)
     return r
-
-
-global_connection = None
 
 
 def get_connection():
