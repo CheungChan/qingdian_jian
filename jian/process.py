@@ -47,7 +47,7 @@ class Process:
         # 所有已推荐过的内容id
         self.jianed_cids = mongo_models.JianHistory.get_jian_history(self.uid)
         # 应该过滤的内容id
-        self.fitering_cids = self.dissed_cids + self.jianed_cids
+        self.fitering_cids = self.dissed_cids + self.jianed_cids + self.tracked_cids
         self.len_tracked = len(self.tracked_cids)
         logger.debug(f'uid {self.uid} 找到cids个数 {self.len_tracked}')
 

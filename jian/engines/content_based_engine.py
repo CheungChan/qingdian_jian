@@ -108,19 +108,6 @@ class ContentBasedEngine(BaseEngine):
         return a
 
     @classmethod
-    @lru_cache(None, typed=True)
-    def text_rank_str(cls, s, topK=20, withWeight=True) -> list:
-        """
-        使用text_rank算法，其余同tf_idf_str
-        :param s:
-        :param topK:
-        :param withWeight:
-        :return:
-        """
-        a = jieba.analyse.textrank(s, withWeight=withWeight, topK=topK)
-        return a
-
-    @classmethod
     def merge_tag(cls, tag1=None, tag2=None):
         v1 = []
         v2 = []
