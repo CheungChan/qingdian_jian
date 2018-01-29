@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
+import json
 import logging
 import time
-import json
-from functools import wraps
 from datetime import datetime
+from functools import wraps
+
 import pymongo
-from bson.objectid import ObjectId
 import redis
+from bson.objectid import ObjectId
 
 from qingdian_jian import settings
 
@@ -135,7 +136,20 @@ def mock_index(request):
     return 'hello world'
 
 
+def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None):
+    cache = get_redis().get(name)
+    if cache:
+        logger.debug(f"{name}使用redis缓存")
+        return retrive_value_func(cache.decode('utf-8'))
+    else:
+        value = value_func()
+        get_redis().set(name, value, ex=cache_seconds)
+        return value
+
+
 if __name__ == '__main__':
     r = get_redis()
-    request = MockRequest('1', None, None)
-    mock_index(request)
+    # request = MockRequest('1', None, None)
+    # mock_index(request)
+    r.set('azhang_test', 'value', ex=5 * 60)
+    print(r.get('azhang_test'))

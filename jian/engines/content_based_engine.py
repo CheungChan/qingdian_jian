@@ -3,9 +3,9 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
+import json
 import logging
 import os
-import re
 from functools import lru_cache
 from math import sqrt
 from typing import List, Tuple
@@ -14,14 +14,14 @@ import jieba
 
 from jian import models
 from jian.engines.base_engine import BaseEngine
-from qingdian_jian.utils import override
+from qingdian_jian.settings import CACHE_SECONDS
+from qingdian_jian.utils import override, use_cache
 
 logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
 import jieba.analyse
-import jieba.posseg as pseg
 
 
 class ContentBasedEngine(BaseEngine):
@@ -41,15 +41,15 @@ class ContentBasedEngine(BaseEngine):
         result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
         for cid in self.process.tracked_cids:
-            d = models.Contents.get_contentstr_list(cid)
+            d = {k: v for k, v in self.all_content_idstr_dict.items() if k == cid}
             if not d:
                 continue
             else:
                 tracked_id_str[cid] = d.get(cid, '')
-        all_id_str = models.Contents.get_contentstr_list(nocids=self.process.fitering_cids)
+        all_id_str = {k: v for k, v in self.all_content_idstr_dict.items() if k not in self.process.fitering_cids}
         for id1, str1 in tracked_id_str.items():
             for id2, str2 in all_id_str.items():
-                sim = self.str_similarity(str1, str2)
+                sim = self.str_similarity(id1, str1, id2, str2)
                 if 0.0 < sim < 9.9:
                     result.append((id2, sim, self.__class__.__name__))
         result = sorted(result,
@@ -57,42 +57,42 @@ class ContentBasedEngine(BaseEngine):
                         reverse=True)[:self.task_count]
         return result
 
-    @classmethod
-    @lru_cache(None, typed=True)
-    def ignore_str(cls, s: str) -> str:
-        """
-        去除字符串中的非人类语言
-        :param s:
-        :return:
-        """
-        IGNORE_MATCH = re.compile('^\S+：|@\S+\s|cn：|服装：|con：')
-        # 用户昵称|@xxx|cn:|服装:|con:
-        at = IGNORE_MATCH.findall(s)
-        # logger.info(f'去除非人类语言，发现了匹配 {at}')
-        for a in at:
-            s = s.replace(a, '')
-        return s
+    # @classmethod
+    # @lru_cache(None)
+    # def ignore_str(cls, s: str) -> str:
+    #     """
+    #     去除字符串中的非人类语言
+    #     :param s:
+    #     :return:
+    #     """
+    #     IGNORE_MATCH = re.compile('^\S+：|@\S+\s|cn：|服装：|con：')
+    #     # 用户昵称|@xxx|cn:|服装:|con:
+    #     at = IGNORE_MATCH.findall(s)
+    #     # logger.info(f'去除非人类语言，发现了匹配 {at}')
+    #     for a in at:
+    #         s = s.replace(a, '')
+    #     return s
+
+    # @classmethod
+    # @lru_cache(None)
+    # def no_stop_flag_str(cls, s: str, stop_flag=None) -> list:
+    #     """
+    #     去除特定词性
+    #     :param s:
+    #     :param stop_flag 要去除的词性列表
+    #     :return:
+    #     """
+    #     if not stop_flag:
+    #         stop_flag = ['x', 'c', 'u', 'd', 'p', 't', 'uj', 'm', 'f', 'r']
+    #     words = pseg.cut(s)
+    #     result = []
+    #     for word, flag in words:
+    #         if flag not in stop_flag:
+    #             result.append(word)
+    #     return result
 
     @classmethod
-    @lru_cache(None, typed=True)
-    def no_stop_flag_str(cls, s: str, stop_flag=None) -> list:
-        """
-        去除特定词性
-        :param s:
-        :param stop_flag 要去除的词性列表
-        :return:
-        """
-        if not stop_flag:
-            stop_flag = ['x', 'c', 'u', 'd', 'p', 't', 'uj', 'm', 'f', 'r']
-        words = pseg.cut(s)
-        result = []
-        for word, flag in words:
-            if flag not in stop_flag:
-                result.append(word)
-        return result
-
-    @classmethod
-    @lru_cache(None, typed=True)
+    @lru_cache(None)
     def tf_idf_str(cls, s, topK=20, withWeight=True, ignore=True) -> list:
         """
         使用TF-IDF算法，去除关键词
@@ -101,8 +101,8 @@ class ContentBasedEngine(BaseEngine):
         :param withWeight: 返回值是否带关键词的权重
         :return:
         """
-        if ignore:
-            s = cls.ignore_str(s)
+        # if ignore:
+        #     s = cls.ignore_str(s)
         a = jieba.analyse.extract_tags(s, withWeight=withWeight, topK=topK)
         # logger.debug(a)
         return a
@@ -152,15 +152,31 @@ class ContentBasedEngine(BaseEngine):
                 cls.magnitude(f1) * cls.magnitude(f2) + 0.00000001)
 
     @classmethod
-    @lru_cache(None, typed=True)
-    def str_similarity(cls, s1: str, s2: str) -> float:
+    @lru_cache(None)
+    def str_similarity(cls, id1: int, s1: str, id2: int, s2: str) -> float:
         """
         求解两个字符串的相似度
         :param s1: 字符串1
         :param s2: 字符串2
         :return:
         """
-        tag1 = cls.tf_idf_str(s1)
-        tag2 = cls.tf_idf_str(s2)
-        v1, v2 = cls.merge_tag(tag1, tag2)
-        return cls.similarity(v1, v2)
+        if id2 < id1:
+            id1, id2 = id2, id1
+            s1, s2 = s2, s1
+        name = f"azhang_jian_contentsim_{id1}_{id2}"
+
+        def value_func():
+            tag1 = cls.tf_idf_str(s1)
+            tag2 = cls.tf_idf_str(s2)
+            v1, v2 = cls.merge_tag(tag1, tag2)
+            return cls.similarity(v1, v2)
+
+        retrive_value_func = lambda val: float(val)
+        return use_cache(name, value_func, retrive_value_func, cache_seconds=None)
+
+    @property
+    def all_content_idstr_dict(self):
+        name = "azhang_jian_allcontentidstr"
+        value_func = lambda: json.dumps(models.Contents.get_contentstr_list())
+        retrive_value_func = lambda val: {int(k): v for k, v in json.loads(val).items()}
+        return use_cache(name, value_func, retrive_value_func, cache_seconds=CACHE_SECONDS)
