@@ -22,6 +22,7 @@ global_connection = pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT
 no_cids = [None, 0, 1]
 # 二级缓存,缓存到内存中
 memory_cache_dict = {}
+cache_from_dict = {1: 'redis', 2: 'memory'}
 
 
 def get_redis():
@@ -141,15 +142,20 @@ def mock_index(request):
 def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None,
               USE_MEMORY_CACHE=False):
     global memory_cache_dict
+
     cache = None
     # 如果使用二级缓存,先尝试从内存中取值
     if USE_MEMORY_CACHE:
         cache = memory_cache_dict.get(name)
+        if cache:
+            cache_from = cache_from_dict[2]
     # 未取到值, 从redis中取值
     if not cache:
         cache = get_redis().get(name)
+        if cache:
+            cache_from = cache_from_dict[1]
     if cache:
-        logger.debug(f"{name}使用redis缓存")
+        logger.debug(f"{name}使用{cache_from}缓存")
         return retrive_value_func(cache.decode('utf-8'))
     else:
         value = value_func()
