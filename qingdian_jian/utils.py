@@ -20,6 +20,8 @@ r = redis.Redis(connection_pool=pool)
 global_connection = pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
 # 无效的cid
 no_cids = [None, 0, 1]
+# 二级缓存,缓存到内存中
+memory_cache_dict = {}
 
 
 def get_redis():
@@ -136,14 +138,22 @@ def mock_index(request):
     return 'hello world'
 
 
-def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None):
-    cache = get_redis().get(name)
+def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None,
+              USE_MEMORY_CACHE=False):
+    cache = None
+    if USE_MEMORY_CACHE:
+        cache = memory_cache_dict.get(name)
+    if not cache:
+        cache = get_redis().get(name)
     if cache:
         logger.debug(f"{name}使用redis缓存")
         return retrive_value_func(cache.decode('utf-8'))
     else:
         value = value_func()
         get_redis().set(name, value, ex=cache_seconds)
+        if USE_MEMORY_CACHE:
+            global memory_cache_dict
+            memory_cache_dict[name] = value
         return value
 
 

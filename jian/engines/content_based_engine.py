@@ -173,11 +173,11 @@ class ContentBasedEngine(BaseEngine):
             return cls.similarity(v1, v2)
 
         retrive_value_func = lambda val: float(val)
-        return use_cache(name, value_func, retrive_value_func, cache_seconds=None)
+        return use_cache(name, value_func, retrive_value_func, cache_seconds=None, USE_MEMORY_CACHE=True)
 
     @cached_property
     def all_content_idstr_dict(self):
         name = "azhang_jian_allcontentidstr"
         value_func = lambda: json.dumps(models.Contents.get_contentstr_list())
         retrive_value_func = lambda val: {int(k): v for k, v in json.loads(val).items()}
-        return use_cache(name, value_func, retrive_value_func, cache_seconds=CACHE_SECONDS)
+        return use_cache(name, value_func, retrive_value_func, cache_seconds=CACHE_SECONDS, USE_MEMORY_CACHE=False)
