@@ -11,7 +11,7 @@ from math import sqrt
 from typing import List, Tuple
 
 import jieba
-
+from werkzeug.utils import cached_property
 from jian import models
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.settings import CACHE_SECONDS
@@ -40,6 +40,7 @@ class ContentBasedEngine(BaseEngine):
             return []
         result: List[Tuple[int, float, str]] = []
         tracked_id_str = {}
+
         for cid in self.process.tracked_cids:
             d = {k: v for k, v in self.all_content_idstr_dict.items() if k == cid}
             if not d:
@@ -174,7 +175,7 @@ class ContentBasedEngine(BaseEngine):
         retrive_value_func = lambda val: float(val)
         return use_cache(name, value_func, retrive_value_func, cache_seconds=None)
 
-    @property
+    @cached_property
     def all_content_idstr_dict(self):
         name = "azhang_jian_allcontentidstr"
         value_func = lambda: json.dumps(models.Contents.get_contentstr_list())
