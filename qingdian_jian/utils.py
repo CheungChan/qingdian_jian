@@ -140,9 +140,12 @@ def mock_index(request):
 
 def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None,
               USE_MEMORY_CACHE=False):
+    global memory_cache_dict
     cache = None
+    # 如果使用二级缓存,先尝试从内存中取值
     if USE_MEMORY_CACHE:
         cache = memory_cache_dict.get(name)
+    # 未取到值, 从redis中取值
     if not cache:
         cache = get_redis().get(name)
     if cache:
@@ -151,8 +154,8 @@ def use_cache(name, value_func: callable, retrive_value_func: callable, cache_se
     else:
         value = value_func()
         get_redis().set(name, value, ex=cache_seconds)
+        # 如果使用二级缓存,存入内存.
         if USE_MEMORY_CACHE:
-            global memory_cache_dict
             memory_cache_dict[name] = value
         return value
 
