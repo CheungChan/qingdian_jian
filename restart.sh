@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # 配置
 APP_NAME='qingdian_jian'
@@ -13,8 +14,9 @@ fi
 VIRTUAL_ENV_PYTHON_HOME="$WORKON_HOME"/"$APP_NAME"
 if [ ! -d "$VIRTUAL_ENV_PYTHON_HOME" ]
 then
-    echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,现在开始创建虚拟环境"
-    mkvirtualenv "$APP_NAME"
+    echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,请先创建虚拟环境"
+    echo "命令参考: mkvirtualenv $APP_NAME -p python3"
+    exit -1
 fi
 
 # 装依赖
