@@ -45,7 +45,7 @@ def get_connection():
 
 class Contents_Calculate:
     @classmethod
-    @lru_cache
+    @lru_cache()
     def tf_idf_str(cls, s: str, topK=20, withWeight=True) -> list:
         """
         使用TF-IDF算法，去除关键词
@@ -105,7 +105,7 @@ class Contents_Calculate:
                 cls.magnitude(f1) * cls.magnitude(f2) + 0.00000001)
 
     @classmethod
-    @lru_cache
+    @lru_cache()
     def str_similarity(cls, s1: str, s2: str) -> float:
         """
         求解两个字符串的相似度
