@@ -45,7 +45,7 @@ def get_connection():
 
 class Contents_Calculate:
     @classmethod
-    @lru_cache(1_0000)
+    @lru_cache(None)
     def tf_idf_str(cls, s: str, topK=20, withWeight=True) -> list:
         """
         使用TF-IDF算法，去除关键词
