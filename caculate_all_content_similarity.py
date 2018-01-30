@@ -8,7 +8,9 @@ import jieba
 import pymysql
 
 from qingdian_jian.utils import cache_redis
+from qingdian_jian.settings import DEBUG
 
+print(f'脚本DEBUG={DEBUG}')
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))
@@ -16,7 +18,6 @@ userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
 import jieba.analyse
 
-DEBUG = True
 test_db = {
     'db': 'qdbuluo',
     'host': '10.10.6.2',
