@@ -15,7 +15,7 @@ VIRTUAL_ENV_PYTHON_HOME="$WORKON_HOME"/"$APP_NAME"
 if [ ! -d "$VIRTUAL_ENV_PYTHON_HOME" ]
 then
     echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,请先创建虚拟环境,再尝试运行"
-    echo "命令参考: mkvirtualenv $APP_NAME -p python3"
+    echo "命令参考: mkvirtualenv $APP_NAME -p python3.6"
     exit -1
 fi
 
