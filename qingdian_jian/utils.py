@@ -20,9 +20,6 @@ r = redis.Redis(connection_pool=pool)
 global_connection = pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
 # 无效的cid
 no_cids = [None, 0, 1]
-# 二级缓存,缓存到内存中
-memory_cache_dict = {}
-cache_from_dict = {1: 'redis', 2: 'memory'}
 
 
 def get_redis():
@@ -139,30 +136,29 @@ def mock_index(request):
     return 'hello world'
 
 
-def use_cache(name, value_func: callable, retrive_value_func: callable, cache_seconds: int = None,
-              USE_MEMORY_CACHE=False):
-    global memory_cache_dict
-
-    cache = None
-    # 如果使用二级缓存,先尝试从内存中取值
-    if USE_MEMORY_CACHE:
-        cache = memory_cache_dict.get(name)
-        if cache:
-            cache_from = cache_from_dict[2]
-    # 未取到值, 从redis中取值
-    if not cache:
-        cache = get_redis().get(name)
-        if cache:
-            cache_from = cache_from_dict[1]
+def cache_redis(name, value_func: callable = None, retrive_value_func: callable = None, cache_seconds: int = None):
+    """
+    缓存到redis或者从redis中取值
+    :param name:
+    :param value_func: 如果为None,则只get,如果为无参数函数,返回值作为要set的value
+    :param retrive_value_func: 函数用于转换redis返回的值,如果为None,不转换.
+    :param cache_seconds: 要缓存的秒数.如果为None,永久缓存.
+    :return:
+    """
+    cache = get_redis().get(name)
     if cache:
-        logger.debug(f"{name}使用{cache_from}缓存")
-        return retrive_value_func(cache.decode('utf-8'))
+        logger.debug(f"{name}使用redis缓存")
+        value = cache.decode('utf-8')
+        if retrive_value_func is None:
+            return value
+        return retrive_value_func(value)
     else:
+        if value_func is None:
+            if retrive_value_func is None:
+                return None
+            return retrive_value_func(None)
         value = value_func()
         get_redis().set(name, value, ex=cache_seconds)
-        # 如果使用二级缓存,存入内存.
-        if USE_MEMORY_CACHE:
-            memory_cache_dict[name] = value
         return value
 
 
