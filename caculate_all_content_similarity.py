@@ -27,11 +27,11 @@ test_db = {
 
 }
 prod_db = {
-    'NAME': 'qdbuluo',
-    'HOST': '10.10.10.2',
-    'PORT': 2000,
-    'USER': 'qd',
-    'PASSWORD': '123^%$-qwe-asd',
+    'db': 'qdbuluo',
+    'host': '10.10.10.2',
+    'port': 2000,
+    'user': 'qd',
+    'password': '123^%$-qwe-asd',
     'charset': 'utf8mb4',
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
