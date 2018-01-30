@@ -1,13 +1,14 @@
 import json
 import logging
 import os
+from functools import lru_cache
 from math import sqrt
 
 import jieba
 import pymysql
 
-from qingdian_jian.settings import DEBUG
 from qingdian_jian.utils import cache_redis
+from qingdian_jian.settings import DEBUG
 
 print(f'脚本DEBUG={DEBUG}')
 logging.basicConfig(level=logging.DEBUG)
@@ -44,6 +45,7 @@ def get_connection():
 
 class Contents_Calculate:
     @classmethod
+    @lru_cache(1_0000)
     def tf_idf_str(cls, s: str, topK=20, withWeight=True) -> list:
         """
         使用TF-IDF算法，去除关键词
