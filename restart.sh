@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+#set -e
 
 # 配置
 APP_NAME='qingdian_jian'
@@ -21,13 +21,13 @@ fi
 
 # 装依赖
 echo '安装依赖'
-"$VIRTUAL_ENV_PYTHON_HOME"/bin/pip install -r requirements.txt
+"$VIRTUAL_ENV_PYTHON_HOME"/bin/pip install -r requirements.txt || echo "依赖安装失败"; exit -1
 echo "依赖安装完成"
 
 # 杀
 echo "尝试停止 $APP_NAME"
 echo "运行中的任务:"
-ps aux|grep ${APP_NAME}|grep -v 'grep'
+ps aux|grep "$APP_NAME"|grep -v 'grep'
 if [ $? -ne 0 ]
 then
     echo "**** $APP_NAME 未运行"
