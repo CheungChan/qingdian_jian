@@ -14,14 +14,14 @@ fi
 VIRTUAL_ENV_PYTHON_HOME="$WORKON_HOME"/"$APP_NAME"
 if [ ! -d "$VIRTUAL_ENV_PYTHON_HOME" ]
 then
-    echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,请先创建虚拟环境"
+    echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,请先创建虚拟环境,再尝试运行"
     echo "命令参考: mkvirtualenv $APP_NAME -p python3"
     exit -1
 fi
 
 # 装依赖
 echo '安装依赖'
-"$VIRTUAL_ENV_PYTHON_HOME"/bin/pip install -r requirements.txt || echo "依赖安装失败"; exit -1
+"$VIRTUAL_ENV_PYTHON_HOME"/bin/pip install -r requirements.txt || (echo "依赖安装失败"; exit -1)
 echo "依赖安装完成"
 
 # 杀
