@@ -38,5 +38,5 @@ fi
 
 # 起
 echo "尝试开启 $APP_NAME"
-"$VIRTUAL_ENV_PYTHON_HOME"/bin/gunicorn -D -w 4 -b :"$PORT" "$APP_NAME".wsgi
+"$VIRTUAL_ENV_PYTHON_HOME"/bin/gunicorn -D -w 4 -b :"$PORT" "$APP_NAME".wsgi || (echo "启动失败"; exit -1)
 echo "**** $APP_NAME 启动成功"
