@@ -11,7 +11,7 @@ then
     exit -1
 fi
 VIRTUAL_ENV_PYTHON_HOME="$WORKON_HOME"/"$APP_NAME"
-if [ !-d "$VIRTUAL_ENV_PYTHON_HOME" ]
+if [ ! -d "$VIRTUAL_ENV_PYTHON_HOME" ]
 then
     echo "$VIRTUAL_ENV_PYTHON_HOME 虚拟环境未创建,现在开始创建虚拟环境"
     mkvirtualenv "$APP_NAME"
