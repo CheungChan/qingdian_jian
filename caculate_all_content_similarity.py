@@ -3,6 +3,7 @@ import logging
 import os
 from functools import lru_cache
 from math import sqrt
+import time
 
 import jieba
 import pymysql
@@ -151,4 +152,7 @@ def main():
 
 
 if __name__ == '__main__':
+    start = time.time()
     main()
+    end = time.time()
+    logger.info(f'总执行时间{end-start}s')
