@@ -46,23 +46,24 @@ class ContentBasedEngine(BaseEngine):
         # 过滤
         d = {}
         for cid, simi in result:
-            d.setdefault(cid, 0)
-            d[cid] += simi
+            d.setdefault(cid, [0, 0])  # [sim的累加,次数]
+            d[cid][0] += simi
+            d[cid][1] += 1
         logger.info(f'len(d)={len(d)}')
         for f_id in self.process.fitering_cids:
             d.pop(f_id, None)
+        result = []
+        for cid, sumsim_count_list in d.items():
+            result.append((cid, sumsim_count_list[0] / sumsim_count_list[1]))
         logger.info(f'len(d)={len(d)}')
-        result = list(filter(lambda cid_simi_tuple: cid_simi_tuple[0] not in self.process.fitering_cids, result))
+
         logger.info(datetime.now())
         # 排序
         result = sorted(result,
                         key=lambda cid_sim_tuple: cid_sim_tuple[1],
                         reverse=True)[:self.task_count]
         for r in result:
-            if len(r) == 2:
-                r.append(self.__class__.__name__)
-            else:
-                logger.error(f'r长度错误,r={r}')
+            r.append(self.__class__.__name__)
         return result
 
     @classmethod
