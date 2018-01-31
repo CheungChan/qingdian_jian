@@ -48,7 +48,10 @@ class ContentBasedEngine(BaseEngine):
                         key=lambda cid_sim_tuple: cid_sim_tuple[1],
                         reverse=True)[:self.task_count]
         for r in result:
-            r.append(self.__class__.__name__)
+            if len(r) == 2:
+                r.append(self.__class__.__name__)
+            else:
+                logger.error(f'r长度错误,r={r}')
         return result
 
     @classmethod
