@@ -40,11 +40,11 @@ echo "依赖安装完成"
 # 杀
 echo "尝试停止 $APP_NAME"
 echo "运行中的任务:"
-ps aux|grep "$APP_NAME"|grep -v 'grep'
+ps aux|grep ":$PORT"|grep -v 'grep'
 if [ $? -ne 0 ];then
     echo "**** $APP_NAME 未运行"
 else
-    ps aux|grep ${APP_NAME}|grep -v 'grep'|awk '{print $2}'|xargs kill
+    ps aux|grep ":$PORT"|grep -v 'grep'|awk '{print $2}'|xargs kill
     echo "**** $APP_NAME 终止成功"
 fi
 
