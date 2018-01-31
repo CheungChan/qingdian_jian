@@ -4,7 +4,7 @@ import os
 from functools import lru_cache
 from math import sqrt
 import time
-
+from multiprocessing import Pool
 import jieba
 import pymysql
 
@@ -37,6 +37,7 @@ prod_db = {
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
 GET_ALL_CONTENTS_SQL = "select id,title, desp from contents order by updated_at"
+PROCESS_COUNT = 4
 
 
 def get_connection():
@@ -119,7 +120,7 @@ class Contents_Calculate:
         return cls.similarity(v1, v2)
 
 
-def main():
+def get_all_contents():
     connection = get_connection()
     all_contents: [int, str] = {}
     with connection.cursor() as cursor:
@@ -127,28 +128,39 @@ def main():
         result = cursor.fetchall()
         for cid, title, desp in result:
             all_contents[cid] = title + ' ' + desp
-    all_contents_copy = all_contents.copy()
-    for cid1, desp1 in all_contents.items():
-        name = f'azhang_jian_simi_{cid1}'
-        cached_value = cache_redis(name)
-        if cached_value:
-            logger.info(f'{name} redis中已存在')
+    return all_contents
+
+
+def calcuclate_simi_for_one(cid1, desp1, all_contents):
+    name = f'azhang_jian_simi_{cid1}'
+    cached_value = cache_redis(name)
+    if cached_value:
+        logger.info(f'{name} redis中已存在')
+        return
+    l = list()
+    for cid2, desp2 in all_contents.items():
+        if cid1 == cid2:
             continue
-        l = list()
-        for cid2, desp2 in all_contents_copy.items():
-            if cid1 == cid2:
-                continue
-            simi = Contents_Calculate.str_similarity(desp1, desp2)
-            if not 0.0 < simi < 9.9:
-                continue
-            l.append((cid2, simi))
-        if len(l) == 0:
-            logging.warning(f'{name} 无相似内容')
-        l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
-        value_func = lambda: json.dumps(l)
-        retrive_value_func = lambda l: json.loads(l)
-        cached_value = cache_redis(name, value_func, retrive_value_func)
-        logger.info(f'{name}: {cached_value}')
+        simi = Contents_Calculate.str_similarity(desp1, desp2)
+        if not 0.0 < simi < 9.9:
+            continue
+        l.append((cid2, simi))
+    if len(l) == 0:
+        logging.warning(f'{name} 无相似内容')
+    l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
+    value_func = lambda: json.dumps(l)
+    retrive_value_func = lambda l: json.loads(l)
+    cached_value = cache_redis(name, value_func, retrive_value_func)
+    logger.info(f'{name}: {cached_value}')
+
+
+def main():
+    p = Pool(PROCESS_COUNT)
+    all_contents = get_all_contents()
+    for cid1, desp1 in all_contents.items():
+        p.apply_async(calcuclate_simi_for_one, args=(cid1, desp1, all_contents))
+    p.close()
+    p.join()
 
 
 if __name__ == '__main__':
