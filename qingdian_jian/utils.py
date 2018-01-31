@@ -166,5 +166,13 @@ if __name__ == '__main__':
     r = get_redis()
     # request = MockRequest('1', None, None)
     # mock_index(request)
-    r.set('azhang_test', 'value', ex=5 * 60)
-    print(r.get('azhang_test'))
+    # r.set('azhang_test', 'value', ex=5 * 60)
+    # print(r.get('azhang_test'))
+    db = get_mongo_collection("content_similarity_offline")
+    keys = [k.decode('utf-8') for k in r.keys('azhang_jian_simi_*')]
+    for k in keys:
+        v = r.get(k).decode('utf-8')
+        v = json.loads(v)
+        k = k.replace('azhang_jian_simi_', '')
+        db.insert({k: v})
+        print(k, v)
