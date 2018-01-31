@@ -44,6 +44,14 @@ class ContentBasedEngine(BaseEngine):
             result.extend(cid_simi_list)
         logger.info(datetime.now())
         # 过滤
+        d = {}
+        for cid,simi in result:
+            d.setdefault(cid,0)
+            d[cid] += simi
+        logger.info(f'len(d)={len(d)}')
+        for f_id in self.process.fitering_cids:
+            del d[f_id]
+        logger.info(f'len(d)={len(d)}')
         result = list(filter(lambda cid_simi_tuple: cid_simi_tuple[0] not in self.process.fitering_cids, result))
         logger.info(datetime.now())
         # 排序
