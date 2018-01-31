@@ -37,7 +37,8 @@ prod_db = {
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
 GET_ALL_CONTENTS_SQL = "select id,title, desp from contents order by updated_at"
-PROCESS_COUNT = 4
+PROCESS_COUNT = os.cpu_count()
+print(f'PROCESS_COUNT={PROCESS_COUNT}')
 
 
 def get_connection():
