@@ -10,9 +10,9 @@ WORKER=1
 
 
 # 检测
-if [ $# == 0 ];then
+if [ $# = 0 ];then
     echo "以正式方式启动"
-elif [ $1 == '-t'  -o $1 == '--test' ];then
+elif [ $1 = '-t'  -o $1 = '--test' ];then
     PORT=$TEST_PORT
     echo "以测试方式启动"
 else
