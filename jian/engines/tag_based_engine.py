@@ -31,12 +31,12 @@ class TagBasedEngine(BaseEngine):
         # 所有浏览记录里面的tid和要出现几个cid
         c = Counter(self.process.tracked_tids)
         most_common = c.most_common()
-        logger.debug(f'most_common {most_common}')
+        # logger.debug(f'most_common {most_common}')
         # 如 [(1, 16), (2, 14), (7, 14), (8, 14), (11, 14), (13, 5), (4, 2), (9, 2)]
         s = sum(c.values())  # 总的标签个数
         tid_roundnum = [[t[0], round(t[1] / s * self.task_count)] for t in most_common]
         # 需要某标签的个数 = 某标签浏览的次数 / 所有标签浏览次数 * 需要的个数
-        logger.debug(f'tid_roundnum= {tid_roundnum}')
+        # logger.debug(f'tid_roundnum= {tid_roundnum}')
         # 如 tid_num= [[1, 4], [2, 3], [7, 3], [8, 3], [11, 3], [13, 1], [4, 0], [9, 0]]
 
         # 取正好要的n个 由于most_common元素的第1（从0开始）个元素是四舍五入的结果，如果加起来的和大于n，跳过，最后再处理，

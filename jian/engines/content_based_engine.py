@@ -8,6 +8,7 @@ import logging
 import os
 from functools import lru_cache
 from typing import List, Tuple
+from datetime import datetime
 
 import jieba
 
@@ -35,23 +36,28 @@ class ContentBasedEngine(BaseEngine):
         if self.process.len_tracked == 0:
             return []
         result: List[Tuple[int, float, str]] = []
+        logger.info(datetime.now())
         for cid in self.process.tracked_cids:
             # 内容最相似的已经离线计算好,存到了redis里面,直接取出来.
             cid_simi_list = self.get_cached_similarity(cid)
             if len(cid_simi_list) == 0:
                 continue
             result.extend(cid_simi_list)
+        logger.info(datetime.now())
         # 过滤
         result = list(filter(lambda cid_simi_tuple: cid_simi_tuple[0] not in self.process.fitering_cids, result))
+        logger.info(datetime.now())
         # 排序
         result = sorted(result,
                         key=lambda cid_sim_tuple: cid_sim_tuple[1],
                         reverse=True)[:self.task_count]
+        logger.info(datetime.now())
         for r in result:
             if len(r) == 2:
                 r.append(self.__class__.__name__)
             else:
                 logger.error(f'r长度错误,r={r}')
+        logger.info(datetime.now())
         return result
 
     @classmethod
