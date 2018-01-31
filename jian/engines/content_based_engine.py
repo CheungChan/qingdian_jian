@@ -49,15 +49,11 @@ class ContentBasedEngine(BaseEngine):
             d.setdefault(cid, [0, 0])  # [sim的累加,次数]
             d[cid][0] += simi
             d[cid][1] += 1
-        logger.info(f'len(d)={len(d)}')
         for f_id in self.process.fitering_cids:
             d.pop(f_id, None)
         result = []
         for cid, sumsim_count_list in d.items():
-            result.append((cid, sumsim_count_list[0] / sumsim_count_list[1]))
-        logger.info(f'len(d)={len(d)}')
-
-        logger.info(datetime.now())
+            result.append([cid, sumsim_count_list[0] / sumsim_count_list[1]])
         # 排序
         result = sorted(result,
                         key=lambda cid_sim_tuple: cid_sim_tuple[1],
