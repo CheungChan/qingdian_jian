@@ -35,7 +35,7 @@ class ContentBasedEngine(BaseEngine):
         """
         if self.process.len_tracked == 0:
             return []
-        result: List[Tuple[int, float, str]] = []
+        result: List[List[int, float, str]] = []
         for cid in self.process.tracked_cids:
             # 内容最相似的已经离线计算好,存到了redis里面,直接取出来.
             cid_simi_list = self.get_cached_similarity(cid)
@@ -55,9 +55,9 @@ class ContentBasedEngine(BaseEngine):
         for cid, sumsim_count_list in d.items():
             result.append([cid, sumsim_count_list[0] / sumsim_count_list[1]])
         # 排序
-        result = sorted(result,
-                        key=lambda cid_sim_tuple: cid_sim_tuple[1],
-                        reverse=True)[:self.task_count]
+        result: List[List[int, float]] = sorted(result,
+                                                key=lambda cid_sim_tuple: cid_sim_tuple[1],
+                                                reverse=True)[:self.task_count]
         for r in result:
             r.append(self.__class__.__name__)
         return result
