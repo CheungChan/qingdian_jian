@@ -171,7 +171,7 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
             simi = Contents_Calculate.str_similarity(desp1, desp2)
             logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度 {simi}')
         else:
-            logger.info(f'进程{os.getpid()} {cid1}  {cid2} 相似度{simi}直接取出')
+            logger.debug(f'进程{os.getpid()} {cid1}  {cid2} 相似度{simi}直接取出')
         # if 0.0 < simi < 0.99:
         l.append((cid2, simi))
     if len(l) == 0:
