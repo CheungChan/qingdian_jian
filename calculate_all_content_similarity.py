@@ -157,7 +157,7 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
         # 计算好了的cid2和simi.
         cached_value_dict = {}
         if cached_value:
-            logger.info(f'{cid1}已存在')
+            # logger.debug(f'{cid1}已存在')
             if need_update:
                 pass
             else:
