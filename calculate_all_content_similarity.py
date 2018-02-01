@@ -165,12 +165,13 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
                 return
             cached_value_dict = {cid2_: simi_ for cid2_, simi_ in cached_value['cid2_sim']}
 
-        def calcu_sim():
-            logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度')
-            return Contents_Calculate.str_similarity(desp1, desp2)
-
         # 相似度如果计算过直接取出,否则计算.
-        simi = cached_value_dict.get(cid2, calcu_sim())
+        simi = cached_value_dict.get(cid2)
+        if simi is None:
+            logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度')
+            simi = Contents_Calculate.str_similarity(desp1, desp2)
+        else:
+            logger.info(f'进程{os.getpid()} {cid1}  {cid2} 相似度直接取出')
         if 0.0 < simi < 0.99:
             l.append((cid2, simi))
     if len(l) == 0:
