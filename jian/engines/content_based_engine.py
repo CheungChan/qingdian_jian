@@ -67,4 +67,4 @@ class ContentBasedEngine(BaseEngine):
     def get_cached_similarity(cls, cid):
         db = get_mongo_collection("content_similarity_offline")
         cached_value = db.find_one({'cid': cid})
-        return cached_value if cached_value else []
+        return cached_value['cid2_sim'] if cached_value else []
