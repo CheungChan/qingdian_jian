@@ -16,8 +16,8 @@ from qingdian_jian import settings
 
 logger = logging.getLogger(__name__)
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
-r = redis.Redis(connection_pool=pool)
-global_connection = pymongo.MongoClient(settings.MONGO_HOST, settings.MONGO_PORT)
+r = None
+global_connection = None
 # 无效的cid
 no_cids = [None, 0, 1]
 
@@ -174,5 +174,6 @@ if __name__ == '__main__':
         v = r.get(k).decode('utf-8')
         v = json.loads(v)
         k = k.replace('azhang_jian_simi_', '')
-        db.insert({k: v})
-        print(k, v)
+        data = {'cid': k, 'cid2_sim': v}
+        db.insert(data)
+        print(data)

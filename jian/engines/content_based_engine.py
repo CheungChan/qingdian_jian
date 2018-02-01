@@ -13,7 +13,7 @@ from datetime import datetime
 import jieba
 
 from jian.engines.base_engine import BaseEngine
-from qingdian_jian.utils import override, cache_redis
+from qingdian_jian.utils import override, get_mongo_collection
 
 logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))
@@ -65,6 +65,6 @@ class ContentBasedEngine(BaseEngine):
     @classmethod
     @lru_cache(None)
     def get_cached_similarity(cls, cid):
-        name = f'azhang_jian_simi_{cid}'
-        cached_value = cache_redis(name, retrive_value_func=lambda val: [] if val is None else json.loads(val))
-        return cached_value
+        db = get_mongo_collection("content_similarity_offline")
+        cached_value = db.find_one({'cid': cid})
+        return cached_value if cached_value else []

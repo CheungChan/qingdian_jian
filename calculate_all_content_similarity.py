@@ -1,19 +1,19 @@
-import json
-import logging
 import os
+import sys
+import time
+from datetime import datetime
 from functools import lru_cache
 from math import sqrt
-import time
 from multiprocessing import Pool
+
 import jieba
 import pymysql
+from logzero import logger
 
-from qingdian_jian.utils import cache_redis
 from qingdian_jian.settings import DEBUG
+from qingdian_jian.utils import get_mongo_collection
 
 print(f'脚本DEBUG={DEBUG}')
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
@@ -37,7 +37,8 @@ prod_db = {
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
 GET_ALL_CONTENTS_SQL = "select id,title, desp from contents order by updated_at"
-PROCESS_COUNT = os.cpu_count() -1
+PROCESS_COUNT = os.cpu_count() - 1
+# PROCESS_COUNT = 1
 print(f'PROCESS_COUNT={PROCESS_COUNT}')
 time.sleep(2)
 
@@ -133,40 +134,54 @@ def get_all_contents():
     return all_contents
 
 
-def calcuclate_simi_for_one(cid1, desp1, all_contents):
-    name = f'azhang_jian_simi_{cid1}'
-    cached_value = cache_redis(name)
-    if cached_value:
-        logger.info(f'{name} redis中已存在')
-        return
+def calcuclate_simi_for_one(cid1, desp1, all_contents, need_update):
+    """
+    计算内容id为cid1,内容描述为desp1与all_contents所有内容中每个的相似度
+    :param cid1:
+    :param desp1:
+    :param all_contents:
+    :param need_update: 已经计算过,是否更新
+    :return:
+    """
+    db = get_mongo_collection("content_similarity_offline")
+    cached_value = db.find_one({'cid': cid1})
     l = list()
     for cid2, desp2 in all_contents.items():
         if cid1 == cid2:
             continue
+        if cached_value:
+            logger.info(f'{cid1}已存在')
+            if need_update:
+                logger.info('更新')
+            else:
+                logger.info('跳过')
+                continue
         simi = Contents_Calculate.str_similarity(desp1, desp2)
-        if not 0.0 < simi < 9.9:
-            continue
-        l.append((cid2, simi))
+        if 0.0 < simi < 0.99:
+            l.append((cid2, simi))
     if len(l) == 0:
-        logging.warning(f'{name} 无相似内容')
+        logger.warning(f'{cid1} 无相似内容')
     l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
-    value_func = lambda: json.dumps(l)
-    retrive_value_func = lambda l: json.loads(l)
-    cached_value = cache_redis(name, value_func, retrive_value_func)
-    logger.info(f'{name}: {cached_value}')
+    data = {'cid': cid1, 'cid2_sim': l,'update_time':datetime.now()}
+    db.update({'cid': cid1}, data, upsert=True)
+    logger.info(data)
 
 
-def main():
+def main(need_update):
     p = Pool(PROCESS_COUNT)
     all_contents = get_all_contents()
+    logger.info(f'总共{len(all_contents)}条内容')
     for cid1, desp1 in all_contents.items():
-        p.apply_async(calcuclate_simi_for_one, args=(cid1, desp1, all_contents))
+        p.apply_async(calcuclate_simi_for_one, args=(cid1, desp1, all_contents, need_update))
     p.close()
     p.join()
 
 
 if __name__ == '__main__':
+    need_update = False
+    if len(sys.argv) == 2 and sys.argv[1] == '-u':
+        need_update = True
     start = time.time()
-    main()
+    main(need_update)
     end = time.time()
     logger.info(f'总执行时间{end-start}s')
