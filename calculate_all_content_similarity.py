@@ -164,7 +164,11 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
                 logger.info('返回')
                 return
             cached_value_dict = {cid2_: simi_ for cid2_, simi_ in cached_value['cid2_sim']}
-        calcu_sim = lambda: Contents_Calculate.str_similarity(desp1, desp2)
+
+        def calcu_sim():
+            logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度')
+            return Contents_Calculate.str_similarity(desp1, desp2)
+
         # 相似度如果计算过直接取出,否则计算.
         simi = cached_value_dict.get(cid2, calcu_sim())
         if 0.0 < simi < 0.99:
