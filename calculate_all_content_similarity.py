@@ -154,8 +154,8 @@ def calcuclate_simi_for_one(cid1, desp1, all_contents, need_update):
             if need_update:
                 logger.info('更新')
             else:
-                logger.info('跳过')
-                continue
+                logger.info('返回')
+                return
         simi = Contents_Calculate.str_similarity(desp1, desp2)
         if 0.0 < simi < 0.99:
             l.append((cid2, simi))
