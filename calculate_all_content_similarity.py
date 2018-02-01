@@ -39,7 +39,7 @@ prod_db = {
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
 GET_ALL_CONTENTS_SQL = "select id,title, desp from contents order by updated_at"
 PROCESS_COUNT = os.cpu_count() - 1
-PROCESS_COUNT = 1
+# PROCESS_COUNT = 1
 print(f'PROCESS_COUNT={PROCESS_COUNT}')
 time.sleep(2)
 
