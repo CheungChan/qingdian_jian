@@ -159,7 +159,7 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
         if cached_value:
             logger.info(f'{cid1}已存在')
             if need_update:
-                logger.info('更新')
+                pass
             else:
                 logger.info('返回')
                 return
@@ -172,8 +172,8 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
             simi = Contents_Calculate.str_similarity(desp1, desp2)
         else:
             logger.info(f'进程{os.getpid()} {cid1}  {cid2} 相似度直接取出')
-        if 0.0 < simi < 0.99:
-            l.append((cid2, simi))
+        # if 0.0 < simi < 0.99:
+        l.append((cid2, simi))
     if len(l) == 0:
         logger.warning(f'{cid1} 无相似内容')
     l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
