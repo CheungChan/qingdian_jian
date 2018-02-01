@@ -180,7 +180,7 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
     data = {'cid': cid1, 'cid2_sim': l, 'update_time': datetime.now()}
     # 已存在了就更新,没有就插入.
     db.update({'cid': cid1}, data, upsert=True)
-    logger.info(data)
+    # logger.debug(data)
     logger.info(f'{cid1} 相似度计算完成')
 
 
