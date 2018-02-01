@@ -46,7 +46,7 @@ class ContentBasedEngine(BaseEngine):
         # 过滤
         d = {}
         for cid, simi in result:
-            d.setdefault(cid, [0, 0])  # [sim的累加,次数]
+            d.setdefault(cid, [0, 0.000000001])  # [sim的累加,次数]
             d[cid][0] += simi
             d[cid][1] += 1
         for f_id in self.process.fitering_cids:
