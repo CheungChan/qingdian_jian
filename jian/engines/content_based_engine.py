@@ -41,7 +41,7 @@ class ContentBasedEngine(BaseEngine):
         kcid_vlensimi_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache.get_cached_user_content_similarity(
             self.process.uid)
         logger.info('加载完成')
-        for cid in self.process.tracked_cids:
+        for cid in list(set(self.process.tracked_cids)):
             # 内容最相似的已经离线计算好,存到了mongo里面,直接取出来.
             cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid)
             if len(cid_simi_list) == 0:
