@@ -81,7 +81,7 @@ class Contents(models.Model):
 
     @classmethod
     def get_contentstr_list(cls, cid=None, nocids=None) -> Dict:
-        records = cls.objects.all()
+        records = cls.objects.filter(status=0)
         if cid:
             records = records.filter(id=cid)
         if nocids:
