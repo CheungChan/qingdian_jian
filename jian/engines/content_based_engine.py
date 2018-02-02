@@ -45,6 +45,7 @@ class ContentBasedEngine(BaseEngine):
         logger.info('相似度计算后')
         # 过滤
         d = {}
+        logger.info(f'len_result={len(result)}')
         for cid, simi in result:
             d.setdefault(cid, [0, 0.0])  # [sim的累加,次数]
             d[cid][0] += simi
