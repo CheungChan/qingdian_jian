@@ -5,12 +5,13 @@
 import logging
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import List, Dict
+from functools import lru_cache
+from typing import List, Dict, Tuple
 
 import pymongo
 
 from jian import models
-from qingdian_jian.utils import get_mongo_collection
+from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int
 
 logger = logging.getLogger(__name__)
 
@@ -203,3 +204,49 @@ class JianHistory:
         if client is not None:
             condition.update({'analyze.client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
+
+
+class ContentSimilarityOffline:
+    collection_name = 'content_similarity_offline'
+
+    # cid:xxx cid2_sim:[[1,0.1],[2,0.3],..]
+    @classmethod
+    @lru_cache(None)
+    def get_cached_similarity_by_cid(cls, cid):
+        db = get_mongo_collection(cls.collection_name)
+        cached_value = db.find_one({'cid': cid})
+        return cached_value['cid2_sim'] if cached_value else []
+
+
+class UserContentSimilarityCache:
+    collection_name = 'user_content_similarity_cache'
+
+    @classmethod
+    def set_cached_user_content_similarity(cls, uid: int,
+                                           kcid_vlensimi_dict: Dict[int, int],
+                                           kcid_vtuplesumsimi0_countsimi1_dict: Dict[int, Tuple[float, int]]):
+        """
+
+        :param uid:
+        @:param kcid_vlensimi_dict : key为内容id,value为 内容id对应的相似内容的长度.由于每个内容相似内容的长度不一定相同,可能
+        正在计算中,导致后面的内容相似内容长度短于开始的.
+        :param kcid_vtuplesumsimi0_countsimi1_dict: key为内容id,
+        value为一个元素0位相似度的和1为相似度出现的次数的tuple组成的dict .
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        data = {'uid': uid,
+                'kcid_vlensimi_dict': jsonKeys2str(kcid_vlensimi_dict),
+                'kcid_vtuplesumsimi0_countsimi1_dict': jsonKeys2str(kcid_vtuplesumsimi0_countsimi1_dict),
+                'update_time': datetime.now()}
+        db.update({'uid': uid}, data, upsert=True)
+
+    @classmethod
+    def get_cached_user_content_similarity(cls, uid) -> Tuple[Dict[int, int], Dict[int, Tuple[float, int]]]:
+        db = get_mongo_collection(cls.collection_name)
+        cached_value = db.find_one({'uid': uid})
+        if cached_value:
+            return jsonKeys2int(cached_value['kcid_vlensimi_dict']), jsonKeys2int(
+                cached_value['kcid_vtuplesumsimi0_countsimi1_dict'])
+        else:
+            return {}, {}

@@ -36,31 +36,34 @@ class ContentBasedEngine(BaseEngine):
         """
         if self.process.len_tracked == 0:
             return []
-        d = {}
+
+        # 加载上次的计算结果
+        kcid_vlensimi_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache.get_cached_user_content_similarity(
+            self.process.uid)
         for cid in self.process.tracked_cids:
-            # 内容最相似的已经离线计算好,存到了redis里面,直接取出来.
+            # 内容最相似的已经离线计算好,存到了mongo里面,直接取出来.
             cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid)
             if len(cid_simi_list) == 0:
                 continue
-            for cid, simi in cid_simi_list:
-                d.setdefault(cid, [0, 0.0])  # [sim的累加,次数]
-                d[cid][0] += simi
-                d[cid][1] += 1
-        logger.info('相似度计算后')
-        # 过滤
+            len_simi_lasttime = kcid_vlensimi_dict.get(cid, 0)
+            # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
+            for cid, simi in cid_simi_list[len_simi_lasttime:]:
+                kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid, [0, 0.0])  # [sim的累加,次数]
+                kcid_vtuplesumsimi0_countsimi1_dict[cid][0] += simi
+                kcid_vtuplesumsimi0_countsimi1_dict[cid][1] += 1
+            # 更新cid对应的相似的个数
+            kcid_vlensimi_dict[cid] = len(cid_simi_list)
+        logger.info('相似度转换为dict后')
+        # 存储计算结果
+        mongo_models.UserContentSimilarityCache.set_cached_user_content_similarity(self.process.uid, kcid_vlensimi_dict,
+                                                                                   kcid_vtuplesumsimi0_countsimi1_dict)
 
-        # 经过日志发现,摊平特别浪费时间,随着用户喜欢的增加,要摊平的result长度飙升.比如我的result长度现在是2千万多.所以考虑将计算过的d
-        # 缓存起来.
-        # 具体方案: 将key为uid,值为len(tracked_ids),len(simi_per_cid),d缓存起来.当len(tracked_ids),len(simi_per_cid)变大时,
-        # 将d取出,在d基础上做更新,更新的内容是作为条件计算.这样只需要计算没算过的那部分result就可以了.
-        # d = cached_d + (len_simi_now - len_simi_cache) * len_tracked_cached +
-        # (len_tracked_now - len_tracked_cached) * len_simi_now
-        logger.info('摊平后')
+        # 过滤
         for f_id in self.process.fitering_cids:
-            d.pop(f_id, None)
+            kcid_vtuplesumsimi0_countsimi1_dict.pop(f_id, None)
         logger.info('过滤后')
         result = []
-        for cid, sumsim_count_list in d.items():
+        for cid, sumsim_count_list in kcid_vtuplesumsimi0_countsimi1_dict.items():
             result.append([cid, sumsim_count_list[0] / sumsim_count_list[1]])
         logger.info('计算加权平均后')
         # 排序

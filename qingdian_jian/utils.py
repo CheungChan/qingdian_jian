@@ -162,6 +162,14 @@ def cache_redis(name, value_func: callable = None, retrive_value_func: callable 
         return value
 
 
+def jsonKeys2int(x):
+    return {int(k): v for k, v in x.items()}
+
+
+def jsonKeys2str(x):
+    return {str(k): v for k, v in x.items()}
+
+
 if __name__ == '__main__':
     r = get_redis()
     # request = MockRequest('1', None, None)
