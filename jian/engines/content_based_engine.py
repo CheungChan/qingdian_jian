@@ -40,7 +40,6 @@ class ContentBasedEngine(BaseEngine):
         # 加载上次的计算结果
         kcid_vlensimi_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache.get_cached_user_content_similarity(
             self.process.uid)
-        logger.info('加载完成')
         tracked_cids = list(set(self.process.tracked_cids))
         for cid1 in tracked_cids:
             # 内容最相似的已经离线计算好,存到了mongo里面,直接取出来.
@@ -48,15 +47,16 @@ class ContentBasedEngine(BaseEngine):
             if len(cid_simi_list) == 0:
                 continue
             len_simi_lasttime = kcid_vlensimi_dict.get(cid1, 0)
+            len_calculate = len(cid_simi_list) - len_simi_lasttime
+            if len_calculate > 0:
+                logger.info(f'需要计算{len_calculate}个')
             # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
             for cid2, simi in cid_simi_list[len_simi_lasttime:]:
                 kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid2, [0.0, 0])  # [sim的累加,次数]
                 kcid_vtuplesumsimi0_countsimi1_dict[cid2][0] += simi
                 kcid_vtuplesumsimi0_countsimi1_dict[cid2][1] += 1
             # 更新cid对应的相似的个数
-            logger.info(len(kcid_vtuplesumsimi0_countsimi1_dict))
             kcid_vlensimi_dict[cid1] = len(cid_simi_list)
-        logger.info('相似度转换为dict后')
         # 存储计算结果
         mongo_models.UserContentSimilarityCache.set_cached_user_content_similarity(self.process.uid, kcid_vlensimi_dict,
                                                                                    kcid_vtuplesumsimi0_countsimi1_dict)
@@ -64,16 +64,13 @@ class ContentBasedEngine(BaseEngine):
         # 过滤
         for f_id in self.process.fitering_cids:
             kcid_vtuplesumsimi0_countsimi1_dict.pop(f_id, None)
-        logger.info('过滤后')
         result = []
         for cid, sumsim_count_list in kcid_vtuplesumsimi0_countsimi1_dict.items():
             result.append([cid, sumsim_count_list[0] / sumsim_count_list[1]])
-        logger.info('计算加权平均后')
         # 排序
         result: List[List[int, float]] = sorted(result,
                                                 key=lambda cid_sim_tuple: cid_sim_tuple[1],
                                                 reverse=True)[:self.task_count]
-        logger.info('排序后')
         for r in result:
             r.append(self.__class__.__name__)
         return result
