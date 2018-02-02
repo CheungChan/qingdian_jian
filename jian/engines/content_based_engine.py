@@ -41,22 +41,23 @@ class ContentBasedEngine(BaseEngine):
         kcid_vlensimi_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache.get_cached_user_content_similarity(
             self.process.uid)
         logger.info('加载完成')
-        for cid in list(set(self.process.tracked_cids)):
+        tracked_cids = list(set(self.process.tracked_cids))
+        for cid1 in tracked_cids:
             # 内容最相似的已经离线计算好,存到了mongo里面,直接取出来.
-            cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid)
+            cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid1)
             if len(cid_simi_list) == 0:
                 continue
             logger.info(len(cid_simi_list))
-            len_simi_lasttime = kcid_vlensimi_dict.get(cid, 0)
+            len_simi_lasttime = kcid_vlensimi_dict.get(cid1, 0)
             logger.info(len_simi_lasttime)
             # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
-            for cid, simi in cid_simi_list[len_simi_lasttime:]:
-                kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid, [0.0, 0])  # [sim的累加,次数]
-                kcid_vtuplesumsimi0_countsimi1_dict[cid][0] += simi
-                kcid_vtuplesumsimi0_countsimi1_dict[cid][1] += 1
+            for cid2, simi in cid_simi_list[len_simi_lasttime:]:
+                kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid2, [0.0, 0])  # [sim的累加,次数]
+                kcid_vtuplesumsimi0_countsimi1_dict[cid2][0] += simi
+                kcid_vtuplesumsimi0_countsimi1_dict[cid2][1] += 1
             # 更新cid对应的相似的个数
             logger.info(len(kcid_vtuplesumsimi0_countsimi1_dict))
-            kcid_vlensimi_dict[cid] = len(cid_simi_list)
+            kcid_vlensimi_dict[cid1] = len(cid_simi_list)
             logger.info(len(kcid_vlensimi_dict))
         logger.info('相似度转换为dict后')
         # 存储计算结果
