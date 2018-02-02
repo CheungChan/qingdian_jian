@@ -51,7 +51,7 @@ class ContentBasedEngine(BaseEngine):
             logger.info(len_simi_lasttime)
             # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
             for cid, simi in cid_simi_list[len_simi_lasttime:]:
-                kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid, [0, 0.0])  # [sim的累加,次数]
+                kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid, [0.0, 0])  # [sim的累加,次数]
                 kcid_vtuplesumsimi0_countsimi1_dict[cid][0] += simi
                 kcid_vtuplesumsimi0_countsimi1_dict[cid][1] += 1
             # 更新cid对应的相似的个数
