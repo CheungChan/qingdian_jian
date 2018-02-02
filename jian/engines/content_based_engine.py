@@ -46,14 +46,18 @@ class ContentBasedEngine(BaseEngine):
             cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid)
             if len(cid_simi_list) == 0:
                 continue
+            logger.info(len(cid_simi_list))
             len_simi_lasttime = kcid_vlensimi_dict.get(cid, 0)
+            logger.info(len_simi_lasttime)
             # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
             for cid, simi in cid_simi_list[len_simi_lasttime:]:
                 kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid, [0, 0.0])  # [sim的累加,次数]
                 kcid_vtuplesumsimi0_countsimi1_dict[cid][0] += simi
                 kcid_vtuplesumsimi0_countsimi1_dict[cid][1] += 1
             # 更新cid对应的相似的个数
+            logger.info(len(kcid_vtuplesumsimi0_countsimi1_dict))
             kcid_vlensimi_dict[cid] = len(cid_simi_list)
+            logger.info(len(kcid_vlensimi_dict))
         logger.info('相似度转换为dict后')
         # 存储计算结果
         mongo_models.UserContentSimilarityCache.set_cached_user_content_similarity(self.process.uid, kcid_vlensimi_dict,
