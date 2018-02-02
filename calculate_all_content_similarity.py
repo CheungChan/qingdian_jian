@@ -172,7 +172,8 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
         simi = cached_value_dict.get(cid2)
         if simi is None:
             simi = Contents_Calculate.str_similarity(desp1, desp2)
-            logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度 {simi}')
+            if simi > 0.0:
+                logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度 {simi}')
         else:
             # logger.debug(f'进程{os.getpid()} {cid1}  {cid2} 相似度{simi}直接取出')
             pass
