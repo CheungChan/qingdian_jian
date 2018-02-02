@@ -10,10 +10,13 @@ from typing import Dict
 import jieba
 import pymysql
 from logzero import logger
+import logzero
 
 from qingdian_jian.settings import DEBUG
 from qingdian_jian.utils import get_mongo_collection
 
+logfile = f"/tmp/{os.path.basename(__file__)}.log"
+logzero.logfile(logfile, encoding='utf-8', maxBytes=500_0000, backupCount=3)
 print(f'脚本DEBUG={DEBUG}')
 pwd = os.path.dirname(os.path.abspath(__name__))
 userdict = os.path.join(pwd, 'userdict.txt')
