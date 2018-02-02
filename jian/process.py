@@ -81,14 +81,14 @@ class Process:
 
     def filter_data(self):
         logger.info('过滤')
-        logger.info(f'过滤前self.rawdata={self.rawdata}')
+        # logger.info(f'过滤前self.rawdata={self.rawdata}')
         # 要过滤的cid
         rawdata = []
         for cid, sim, engine_name in self.rawdata:
             if cid not in self.fitering_cids:
                 rawdata.append((cid, sim, engine_name))
         self.rawdata = rawdata
-        logger.info(f'过滤后self.rawdata={self.rawdata}')
+        # logger.info(f'过滤后self.rawdata={self.rawdata}')
 
     def order_data(self):
         logger.info('排序')

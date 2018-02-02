@@ -52,7 +52,7 @@ class TagBasedEngine(BaseEngine):
         # else:
         #     logger.debug(f'四舍五入少了，加上{self.task_count-num}')
         #     tid_num[0][1] += self.task_count - num
-        logger.debug(f'tid_num= {tid_num}')
+        # logger.debug(f'tid_num= {tid_num}')
         # 获得数据库中tid对应的所有cids
         for tid, limit in tid_num:
             if limit == 0:
