@@ -42,22 +42,25 @@ class ContentBasedEngine(BaseEngine):
             if len(cid_simi_list) == 0:
                 continue
             result.extend(cid_simi_list)
-        logger.info(datetime.now())
+        logger.info('相似度计算后')
         # 过滤
         d = {}
         for cid, simi in result:
             d.setdefault(cid, [0, 0.000000001])  # [sim的累加,次数]
             d[cid][0] += simi
             d[cid][1] += 1
+        logger.info('过滤后')
         for f_id in self.process.fitering_cids:
             d.pop(f_id, None)
         result = []
         for cid, sumsim_count_list in d.items():
             result.append([cid, sumsim_count_list[0] / sumsim_count_list[1]])
+        logger.info('计算加权平均后')
         # 排序
         result: List[List[int, float]] = sorted(result,
                                                 key=lambda cid_sim_tuple: cid_sim_tuple[1],
                                                 reverse=True)[:self.task_count]
+        logger.info('排序后')
         for r in result:
             r.append(self.__class__.__name__)
         return result
