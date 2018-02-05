@@ -6,7 +6,7 @@
 APP_NAME='qingdian_jian'
 PORT=9000
 TEST_PORT=8000
-WORKER=1
+WORKER=4
 
 
 # 检测
