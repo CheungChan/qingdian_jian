@@ -94,7 +94,7 @@ class Contents(models.Model):
         return d
 
     @classmethod
-    def get_recently_cids(cls, recent_days: int = 2, limit: int = 20, nocids: List[int] = None):
+    def get_recently_cids(cls, recent_days: int = 7, limit: int = 20, nocids: List[int] = None):
         """
         获取最近更新的内容
         :param recent_days:
@@ -107,7 +107,7 @@ class Contents(models.Model):
             nocids = []
         records = cls.objects.filter(status=0)
         recent_cids = []
-        records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('updated_at').values('id')[
+        records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('-updated_at').values('id')[
                   :limit]
         cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
         return cid_sim_list
