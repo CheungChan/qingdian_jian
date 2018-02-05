@@ -18,7 +18,7 @@ from qingdian_jian.utils import get_mongo_collection
 logfile = f"/tmp/{os.path.basename(__file__)}.log"
 logzero.logfile(logfile, encoding='utf-8', maxBytes=500_0000, backupCount=3)
 print(f'脚本DEBUG={DEBUG}')
-pwd = os.path.dirname(os.path.abspath(__name__))
+pwd = os.path.abspath(os.path.dirname(__file__))
 userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
 import jieba.analyse
