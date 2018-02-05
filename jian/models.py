@@ -109,5 +109,5 @@ class Contents(models.Model):
         recent_cids = []
         records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('updated_at').values('id')[
                   :limit]
-        cid_sim_list = [(r[0], 1 / limit) for r in records]
+        cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
         return cid_sim_list
