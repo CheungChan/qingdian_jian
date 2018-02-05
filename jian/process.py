@@ -76,7 +76,7 @@ class Process:
             lack = (task_count - len_new)
             if lack > 0:
                 logger.info(f'引擎得到数据缺少={lack}')
-            else:
+            if len_new > 0:
                 logger.info(f'{class_name}: {newdata}')
             self.rawdata += newdata
 
