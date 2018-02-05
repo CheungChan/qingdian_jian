@@ -74,7 +74,8 @@ class Process:
             newdata = engine.recommend()
             len_new = len(newdata)
             lack = (task_count - len_new)
-            logger.info(f'引擎得到数据{len_new}条, 缺少={lack}')
+            if lack > 0:
+                logger.info(f'引擎得到数据缺少={lack}')
             if len_new > 0:
                 logger.info(f'{class_name}: {newdata}')
             self.rawdata += newdata
