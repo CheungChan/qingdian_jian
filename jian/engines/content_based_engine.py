@@ -3,18 +3,15 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
-import json
 import logging
 import os
-from functools import lru_cache
-from typing import List, Tuple
-from datetime import datetime
+from typing import List
 
 import jieba
 
+from jian import mongo_models
 from jian.engines.base_engine import BaseEngine
 from qingdian_jian.utils import override
-from jian import mongo_models
 
 logger = logging.getLogger(__name__)
 pwd = os.path.dirname(os.path.abspath(__name__))

@@ -8,7 +8,7 @@ from math import ceil
 from random import shuffle
 from typing import List, Tuple
 
-from jian import mongo_models
+from jian import mongo_models, models
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
@@ -48,7 +48,8 @@ class Process:
         # 所有已推荐过的内容id
         self.jianed_cids = mongo_models.JianHistory.get_jian_history(self.uid)
         # 应该过滤的内容id
-        self.fitering_cids = self.dissed_cids + self.jianed_cids + self.tracked_cids
+        self.fitering_cids = list(
+            set(self.dissed_cids + self.jianed_cids + self.tracked_cids + models.Contents.get_all_abmormal_cids()))
         self.len_tracked = len(self.tracked_cids)
         logger.debug(f'uid {self.uid} 找到cids个数 {self.len_tracked}')
 

@@ -57,12 +57,36 @@ class ContentsTag(models.Model):
         return cids
 
 
+class Theme(models.Model):
+    id = models.IntegerField(primary_key=True)
+    platform = models.CharField(max_length=10)
+    platform_type = models.IntegerField()
+    keyword = models.CharField(max_length=200)
+    keyword_type = models.CharField(max_length=20)
+    href = models.CharField(max_length=500)
+    name = models.CharField(max_length=255)
+    desp = models.CharField(max_length=255)
+    fans = models.IntegerField()
+    image = models.CharField(max_length=100)
+    theme_refter_type = models.IntegerField()
+    creator = models.CharField(max_length=20)
+    status = models.IntegerField()
+    is_sift = models.IntegerField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    sourceinfo = models.TextField(db_column='sourceInfo')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'theme'
+
+
 class Contents(models.Model):
     """
     内容表
     """
     id = models.IntegerField(primary_key=True)
-    theme_id = models.IntegerField()
+    theme = models.ForeignKey(Theme, on_delete=models.DO_NOTHING, related_name='theme')
     thirdparty_id = models.CharField(max_length=150, blank=True, null=True)
     publish_time = models.DateTimeField(blank=True, null=True)
     title = models.TextField()
@@ -83,8 +107,13 @@ class Contents(models.Model):
         ordering = ['-updated_at']
 
     @classmethod
+    def get_all_abmormal_cids(cls):
+        cids = cls.objects.exclude(status=0, theme__status=0).values('id')
+        return [c['id'] for c in cids]
+
+    @classmethod
     def get_contentstr_list(cls, cid=None, nocids=None) -> Dict:
-        records = cls.objects.filter(status=0)
+        records = cls.objects.filter(status=0, theme__status=0)
         if cid:
             records = records.filter(id=cid)
         if nocids:
@@ -105,8 +134,7 @@ class Contents(models.Model):
         recent = datetime.now() - timedelta(days=recent_days)
         if nocids is None:
             nocids = []
-        records = cls.objects.filter(status=0)
-        recent_cids = []
+        records = cls.objects.filter(status=0, theme__status=0)
         records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('-updated_at').values('id')[
                   :limit]
         cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
