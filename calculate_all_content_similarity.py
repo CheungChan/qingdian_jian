@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import lru_cache
 from math import sqrt
 from multiprocessing import Pool
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import jieba
 import pymysql
@@ -40,10 +40,13 @@ prod_db = {
     'charset': 'utf8mb4',
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
-GET_ALL_CONTENTS_SQL = "select id,title, desp from contents order by updated_at"
+GET_ALL_CONTENTS_SQL = "select id,title, desp from contents where status=0 order by id"
 PROCESS_COUNT = os.cpu_count() - 1
 # PROCESS_COUNT = 1
 print(f'PROCESS_COUNT={PROCESS_COUNT}')
+SIMI_MIN = 0.2
+SIMI_MAX = 0.9
+CACHED_MAX_CID_KEY = 'cached_max_cid'
 time.sleep(2)
 
 
@@ -127,22 +130,22 @@ class Contents_Calculate:
         return cls.similarity(v1, v2)
 
 
-def get_all_contents() -> Dict[int, str]:
+def get_all_contents() -> List[Tuple[int, str]]:
     """
     拿到数据库中所有的内容的id和描述组成的dict
     :return:
     """
     connection = get_connection()
-    all_contents: [int, str] = {}
+    all_contents: List[Tuple[int, str]] = []
     with connection.cursor() as cursor:
         cursor.execute(GET_ALL_CONTENTS_SQL)
         result = cursor.fetchall()
         for cid, title, desp in result:
-            all_contents[cid] = title + ' ' + desp
+            all_contents.append((cid, title + ' ' + desp))
     return all_contents
 
 
-def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str], need_update: bool):
+def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: List[Tuple[int, str]], need_update: bool):
     """
     计算内容id为cid1,内容描述为desp1与all_contents所有内容中每个的相似度
     :param cid1:
@@ -151,40 +154,35 @@ def calcuclate_simi_for_one(cid1: int, desp1: str, all_contents: Dict[int, str],
     :param need_update: 已经计算过,是否更新
     :return:
     """
-    db = get_mongo_collection("content_similarity_offline")
+    db = get_mongo_collection("similarity_of_content")
+    # 上次计算时的cid的长度
+    cached_max_cid = 0
     cached_value = db.find_one({'cid': cid1})
     l = list()
-    for cid2, desp2 in all_contents.items():
+    if cached_value:
+        # logger.debug(f'{cid1}已存在')
+        if need_update:
+            l = cached_value['cid2_sim']
+            cached_max_cid = cached_value.get(CACHED_MAX_CID_KEY, 0)
+        else:
+            logger.info('返回')
+            return
+
+    # 只计算上次没有计算的内容
+    all_contents = [(cid2, desp2) for (cid2, desp2) in all_contents if cid2 > cached_max_cid]
+    for cid2, desp2 in all_contents:
         if cid1 == cid2:
             continue
-        # 计算好了的cid2和simi.
-        cached_value_dict = {}
-        if cached_value:
-            # logger.debug(f'{cid1}已存在')
-            if need_update:
-                pass
-            else:
-                logger.info('返回')
-                return
-            cached_value_dict = {cid2_: simi_ for cid2_, simi_ in cached_value['cid2_sim']}
-
-        # 相似度如果计算过直接取出,否则计算.
-        simi = cached_value_dict.get(cid2)
-        if simi is None:
-            simi = Contents_Calculate.str_similarity(desp1, desp2)
-            if simi > 0.0:
-                logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度 {simi}')
-        else:
-            # logger.debug(f'进程{os.getpid()} {cid1}  {cid2} 相似度{simi}直接取出')
-            pass
-        # if 0.0 < simi < 0.99:
-        l.append((cid2, simi))
-    if len(l) == 0:
-        logger.warning(f'{cid1} 无相似内容')
-    l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
-    data = {'cid': cid1, 'cid2_sim': l, 'update_time': datetime.now()}
-    # 已存在了就更新,没有就插入.
-    db.update({'cid': cid1}, data, upsert=True)
+        simi = Contents_Calculate.str_similarity(desp1, desp2)
+        if SIMI_MIN < simi < SIMI_MAX:
+            logger.info(f'进程{os.getpid()} 计算{cid1}  {cid2} 相似度 {simi}')
+            l.append((cid2, simi))
+    if len(all_contents) > 0:
+        # 如果有更新的内容,重新排序计算.
+        l.sort(key=lambda cid_simi_tuple: cid_simi_tuple[1], reverse=True)
+        data = {'cid': cid1, 'cid2_sim': l, 'update_time': datetime.now(), CACHED_MAX_CID_KEY: all_contents[-1][0]}
+        # 已存在了就更新,没有就插入.
+        db.update({'cid': cid1}, data, upsert=True)
     # logger.debug(data)
     logger.info(f'{cid1} 相似度计算完成')
 
@@ -198,7 +196,7 @@ def main(need_update):
     p = Pool(PROCESS_COUNT)
     all_contents = get_all_contents()
     logger.info(f'总共{len(all_contents)}条内容')
-    for cid1, desp1 in all_contents.items():
+    for cid1, desp1 in all_contents:
         p.apply_async(calcuclate_simi_for_one, args=(cid1, desp1, all_contents, need_update))
     p.close()
     p.join()

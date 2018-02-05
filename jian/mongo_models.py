@@ -6,7 +6,7 @@ import logging
 from collections import Counter
 from datetime import datetime, timedelta
 from functools import lru_cache
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Union
 
 import pymongo
 
@@ -206,16 +206,19 @@ class JianHistory:
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
-class ContentSimilarityOffline:
-    collection_name = 'content_similarity_offline'
+class SimilarityOfContent:
+    collection_name = 'similarity_of_content'
 
     # cid:xxx cid2_sim:[[1,0.1],[2,0.3],..]
     @classmethod
     @lru_cache(None)
-    def get_cached_similarity_by_cid(cls, cid):
+    def get_cached_similarity_by_cid(cls, cid) -> Tuple[List[Union[int, float]], int]:
         db = get_mongo_collection(cls.collection_name)
         cached_value = db.find_one({'cid': cid})
-        return cached_value['cid2_sim'] if cached_value else []
+        if cached_value:
+            return cached_value['cid2_sim'], cached_value['cached_max_cid']
+        else:
+            return [], 0
 
 
 class UserContentSimilarityCache:
@@ -223,30 +226,35 @@ class UserContentSimilarityCache:
 
     @classmethod
     def set_cached_user_content_similarity(cls, uid: int,
-                                           kcid_vlensimi_dict: Dict[int, int],
+                                           kcid_vcached_max_cid_dict: Dict[int, int],
                                            kcid_vtuplesumsimi0_countsimi1_dict: Dict[int, Tuple[float, int]]):
         """
 
         :param uid:
-        @:param kcid_vlensimi_dict : key为内容id,value为 内容id对应的相似内容的长度.由于每个内容相似内容的长度不一定相同,可能
+        @:param kcid_vcached_max_cid_dict : key为内容id,value为 内容id对应的相似内容的长度.由于每个内容相似内容的长度不一定相同,可能
         正在计算中,导致后面的内容相似内容长度短于开始的.
-        :param kcid_vtuplesumsimi0_countsimi1_dict: key为内容id,
-        value为一个元素0位相似度的和1为相似度出现的次数的tuple组成的dict .
+        :param kcid_vtuplesumsimi0_countsimi1_dict: key为内容id,value为相似度的和相似度出现的次数的tuple组成的dict .
         :return:
         """
         db = get_mongo_collection(cls.collection_name)
         data = {'uid': uid,
-                'kcid_vlensimi_dict': jsonKeys2str(kcid_vlensimi_dict),
+                'kcid_vcached_max_cid_dict': jsonKeys2str(kcid_vcached_max_cid_dict),
                 'kcid_vtuplesumsimi0_countsimi1_dict': jsonKeys2str(kcid_vtuplesumsimi0_countsimi1_dict),
                 'update_time': datetime.now()}
         db.update({'uid': uid}, data, upsert=True)
 
     @classmethod
     def get_cached_user_content_similarity(cls, uid) -> Tuple[Dict[int, int], Dict[int, Tuple[float, int]]]:
+        """
+
+        :param uid:
+        :return: kcid_vcached_max_cid_dict和kcid_vtuplesumsimi0_countsimi1_dict组成的tuple,两个变量解释见
+        cls.set_cached_user_content_similarity
+        """
         db = get_mongo_collection(cls.collection_name)
         cached_value = db.find_one({'uid': uid})
         if cached_value:
-            return jsonKeys2int(cached_value['kcid_vlensimi_dict']), jsonKeys2int(
+            return jsonKeys2int(cached_value['kcid_vcached_max_cid_dict']), jsonKeys2int(
                 cached_value['kcid_vtuplesumsimi0_countsimi1_dict'])
         else:
             return {}, {}

@@ -38,27 +38,31 @@ class ContentBasedEngine(BaseEngine):
             return []
 
         # 加载上次的计算结果
-        kcid_vlensimi_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache.get_cached_user_content_similarity(
-            self.process.uid)
+        kcid_vcached_max_cid_dict, kcid_vtuplesumsimi0_countsimi1_dict = mongo_models.UserContentSimilarityCache. \
+            get_cached_user_content_similarity(self.process.uid)
         tracked_cids = list(set(self.process.tracked_cids))
         for cid1 in tracked_cids:
             # 内容最相似的已经离线计算好,存到了mongo里面,直接取出来.
-            cid_simi_list = mongo_models.ContentSimilarityOffline.get_cached_similarity_by_cid(cid1)
+            cid_simi_list, cached_max_cid_now = mongo_models.SimilarityOfContent.get_cached_similarity_by_cid(cid1)
             if len(cid_simi_list) == 0:
+                # cid1没有相似的内容.
                 continue
-            len_simi_lasttime = kcid_vlensimi_dict.get(cid1, 0)
-            len_calculate = len(cid_simi_list) - len_simi_lasttime
+            cached_max_cid_lasttime = kcid_vcached_max_cid_dict.get(cid1, 0)
+            len_calculate = cached_max_cid_now - cached_max_cid_lasttime
             if len_calculate > 0:
                 logger.info(f'需要计算{len_calculate}个')
-            # 加载上次计算的cid对应的相似的个数,通过切片只计算未算过的.
-            for cid2, simi in cid_simi_list[len_simi_lasttime:]:
+            # 加载上次计算的cid对应的相似的个数只计算未算过的.
+            cid_simi_list = [(cid2, simi) for (cid2, simi) in cid_simi_list if
+                             cached_max_cid_lasttime < cid2 <= cached_max_cid_now]
+            for cid2, simi in cid_simi_list:
                 kcid_vtuplesumsimi0_countsimi1_dict.setdefault(cid2, [0.0, 0])  # [sim的累加,次数]
                 kcid_vtuplesumsimi0_countsimi1_dict[cid2][0] += simi
                 kcid_vtuplesumsimi0_countsimi1_dict[cid2][1] += 1
             # 更新cid对应的相似的个数
-            kcid_vlensimi_dict[cid1] = len(cid_simi_list)
+            kcid_vcached_max_cid_dict[cid1] = cached_max_cid_now
         # 存储计算结果
-        mongo_models.UserContentSimilarityCache.set_cached_user_content_similarity(self.process.uid, kcid_vlensimi_dict,
+        mongo_models.UserContentSimilarityCache.set_cached_user_content_similarity(self.process.uid,
+                                                                                   kcid_vcached_max_cid_dict,
                                                                                    kcid_vtuplesumsimi0_countsimi1_dict)
 
         # 过滤
