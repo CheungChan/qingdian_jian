@@ -38,7 +38,7 @@ class JianTrack:
         return trackcids, tracktids
 
     @classmethod
-    def get_recently_hot_tracked(cls, recent_days: int = 2, limit: int = 20, nocids: List[int] = None):
+    def get_recently_hot_tracked(cls, recent_days: int = 7, limit: int = 20, nocids: List[int] = None):
         """
         获取最近热门的track。
         :param recent_days:

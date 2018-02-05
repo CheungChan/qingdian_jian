@@ -3,7 +3,10 @@
 # @Time    : 2018/1/4 17:27
 # @Author  : 陈章
 
+from datetime import datetime, timedelta
 from typing import Dict
+from typing import List
+
 from django.db import models
 
 
@@ -89,3 +92,22 @@ class Contents(models.Model):
         records = records.values('id', 'title', 'desp')
         d = {r['id']: r['title'] + r['desp'] for r in records}
         return d
+
+    @classmethod
+    def get_recently_cids(cls, recent_days: int = 2, limit: int = 20, nocids: List[int] = None):
+        """
+        获取最近更新的内容
+        :param recent_days:
+        :param limit:
+        :param nocids: 要排除的内容id
+        :return:
+        """
+        recent = datetime.now() - timedelta(days=recent_days)
+        if nocids is None:
+            nocids = []
+        records = cls.objects.filter(status=0)
+        recent_cids = []
+        records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('updated_at').values('id')[
+                  :limit]
+        cid_sim_list = [(r[0], 1 / limit) for r in records]
+        return cid_sim_list

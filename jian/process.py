@@ -12,6 +12,7 @@ from jian import mongo_models
 from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
+from jian.engines.recent_based_engine import RecentBasedEngine
 from qingdian_jian.settings import weight
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class Process:
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
     此类是一个callable的类，调用可以获得推荐结果。
     """
-    engine_name_list = [c.__name__ for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine)]
+    engine_name_list = [c.__name__ for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine, RecentBasedEngine)]
 
     def __init__(self, uid, n, client, device_id):
         self.uid = uid
