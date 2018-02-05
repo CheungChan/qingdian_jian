@@ -186,10 +186,10 @@ LOGGING = {
             # 'propagate': True,  # this tells logger to send logging message
             # to its parent (will send if set to True)
         },
-        'django': {
-            'handlers': ['console_handler', "default_handler"],
-            'level': 'DEBUG',
-        },
+        # 'django': {
+        #     'handlers': ['console_handler', "default_handler"],
+        #     'level': 'DEBUG',
+        # },
     },
 }
 STATIC_URL = '/static/'
