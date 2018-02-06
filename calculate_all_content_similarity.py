@@ -12,7 +12,7 @@ import pymysql
 from logzero import logger
 import logzero
 
-from qingdian_jian.settings import DEBUG
+from qingdian_jian.settings import DEBUG, test_db, prod_db
 from qingdian_jian.utils import get_mongo_collection
 
 logfile = f"/tmp/{os.path.basename(__file__)}.log"
@@ -23,20 +23,21 @@ userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
 import jieba.analyse
 
+default_test_db = test_db.get('default')
 test_db = {
-    'db': 'qdbuluo',
-    'host': '10.10.6.2',
-    'user': 'develop',
-    'password': '123-qwe',
+    'db': default_test_db.get('NAME'),
+    'host': default_test_db.get('HOST'),
+    'user': default_test_db.get('USER'),
+    'password': default_test_db.get('PASSWORD'),
     'charset': 'utf8mb4',
 
 }
+default_prod_db = prod_db.get('default')
 prod_db = {
-    'db': 'qdbuluo',
-    'host': '10.10.10.2',
-    'port': 2000,
-    'user': 'qd',
-    'password': '123^%$-qwe-asd',
+    'db': default_prod_db.get('NAME'),
+    'host': default_prod_db.get('HOST'),
+    'user': default_prod_db.get('USER'),
+    'password': default_prod_db.get('PASSWORD'),
     'charset': 'utf8mb4',
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
