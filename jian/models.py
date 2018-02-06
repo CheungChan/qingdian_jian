@@ -75,6 +75,11 @@ class Theme(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
     sourceinfo = models.TextField(db_column='sourceInfo')  # Field name made lowercase.
+    is_square = models.IntegerField()
+    is_red_packet = models.IntegerField()
+    sort = models.IntegerField()
+    user_id = models.IntegerField()
+    is_secret = models.IntegerField()
 
     class Meta:
         managed = False
@@ -100,6 +105,10 @@ class Contents(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
     mongo_id = models.CharField(max_length=100)
+    is_placed = models.IntegerField()
+    is_secret = models.IntegerField()
+    dynamic_time = models.DateTimeField()
+    user_id = models.IntegerField()
 
     class Meta:
         managed = False
@@ -108,7 +117,7 @@ class Contents(models.Model):
 
     @classmethod
     def get_all_abmormal_cids(cls):
-        cids = cls.objects.exclude(status=0, theme__status=0).values('id')
+        cids = cls.objects.exclude(status=0, is_secret=0, theme__status=0, theme__is_secret=0).values('id')
         return [c['id'] for c in cids]
 
     @classmethod
@@ -134,7 +143,7 @@ class Contents(models.Model):
         recent = datetime.now() - timedelta(days=recent_days)
         if nocids is None:
             nocids = []
-        records = cls.objects.filter(status=0, theme__status=0)
+        records = cls.objects.filter(status=0, is_secret=0, theme__status=0, theme__is_secret=0)
         records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('-updated_at').values('id')[
                   :limit]
         cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
