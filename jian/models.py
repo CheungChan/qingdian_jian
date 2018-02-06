@@ -16,13 +16,17 @@ class ContentsTag(models.Model):
     """
     content_id = models.IntegerField()
     tag_id = models.IntegerField()
-    name = models.CharField(max_length=10)
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
     class Meta:
         managed = False
         db_table = 'contents_tag'
+        verbose_name = '内容标题对应表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'content_id={self.content_id}, tag_id={self.tag_id}'
 
     @classmethod
     def get_tids_by_cid(cls, cid):
@@ -79,6 +83,11 @@ class Theme(models.Model):
     class Meta:
         managed = False
         db_table = 'theme'
+        verbose_name = '主题表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'id={self.id}, name={self.name}'
 
 
 class Contents(models.Model):
@@ -101,10 +110,15 @@ class Contents(models.Model):
     updated_at = models.DateTimeField()
     mongo_id = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f'id={self.id}, title={self.title}'
+
     class Meta:
         managed = False
         db_table = 'contents'
         ordering = ['-updated_at']
+        verbose_name = '内容表'
+        verbose_name_plural = verbose_name
 
     @classmethod
     def get_all_abmormal_cids(cls):
