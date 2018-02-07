@@ -41,6 +41,7 @@ prod_db = {
     'charset': 'utf8mb4',
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
+print(BL_MYSQL_CONF)
 GET_ALL_CONTENTS_SQL = "select id,title, desp from contents where status=0 order by id"
 PROCESS_COUNT = os.cpu_count() - 1
 # PROCESS_COUNT = 1
