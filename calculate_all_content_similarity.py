@@ -25,19 +25,19 @@ import jieba.analyse
 
 default_test_db = test_db.get('default')
 test_db = {
-    'db': default_test_db.get('NAME'),
-    'host': default_test_db.get('HOST'),
-    'user': default_test_db.get('USER'),
-    'password': default_test_db.get('PASSWORD'),
+    'db': 'qdbuluo',
+    'host': '10.10.6.2',
+    'user': 'develop',
+    'passport': '123-qwe',
     'charset': 'utf8mb4',
-
 }
 default_prod_db = prod_db.get('default')
 prod_db = {
-    'db': default_prod_db.get('NAME'),
-    'host': default_prod_db.get('HOST'),
-    'user': default_prod_db.get('USER'),
-    'password': default_prod_db.get('PASSWORD'),
+    'db': 'qingdian',
+    'host': '10.10.6.6',
+    'port': 3306,
+    'user': 'develop',
+    'password': '123^%$-qwe',
     'charset': 'utf8mb4',
 }
 BL_MYSQL_CONF = test_db if DEBUG else prod_db
