@@ -95,9 +95,9 @@ class Process:
 
     def order_data(self):
         logger.info('排序')
-        self.rawdata = self.rawdata[:self.n]
+        self.rawdata = list(set(self.rawdata))[:self.n]
         shuffle(self.rawdata)
-        self.data = list(set([d[0] for d in self.rawdata]))
+        self.data = [d[0] for d in self.rawdata]
         c = Counter(r[2] for r in self.rawdata)
         # 推荐的引擎来源和个数
         self.analyze = {'rate': self.rawdata, 'every_count': c.most_common(), 'counts': len(self.rawdata),
