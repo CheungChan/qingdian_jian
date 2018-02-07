@@ -71,7 +71,7 @@ def log_views(f):
         logger.info(settings.LOG_BEGIN + path)
         r = f(*args, **kwargs)
         end = time.time()
-        logger.info(settings.LOG_END + path)
+        logger.info(settings.LOG_END)
         logger.info(f'{end-start} s')
         return r
 
