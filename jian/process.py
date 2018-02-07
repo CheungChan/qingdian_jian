@@ -95,8 +95,8 @@ class Process:
 
     def order_data(self):
         logger.info('排序')
-        shuffle(self.rawdata)
         self.rawdata = self.rawdata[:self.n]
+        shuffle(self.rawdata)
         self.data = list(set([d[0] for d in self.rawdata]))
         c = Counter(r[2] for r in self.rawdata)
         # 推荐的引擎来源和个数
