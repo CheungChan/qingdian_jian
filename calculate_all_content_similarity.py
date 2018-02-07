@@ -33,7 +33,7 @@ test_db = {
 }
 default_prod_db = prod_db.get('default')
 prod_db = {
-    'db': 'qingdian',
+    'db': 'qdbuluo',
     'host': '10.10.6.6',
     'port': 3306,
     'user': 'develop',
