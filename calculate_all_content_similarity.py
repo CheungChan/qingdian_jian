@@ -49,10 +49,13 @@ SIMI_MIN = 0.2
 SIMI_MAX = 0.9
 CACHED_MAX_CID_KEY = 'cached_max_cid'
 time.sleep(2)
+connection = None
 
 
 def get_connection():
-    connection = pymysql.connect(**BL_MYSQL_CONF)
+    global connection
+    if not connection:
+        connection = pymysql.connect(**BL_MYSQL_CONF)
     return connection
 
 
