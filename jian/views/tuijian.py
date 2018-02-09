@@ -52,7 +52,7 @@ def jian_history(request):
         logger.error(j)
         return JsonResponse(j, safe=False)
     begin = page_size * (page_no - 1)
-    end = begin + page_size + 1
+    end = begin + page_size
     history = mongo_models.JianHistory.get_jian_history(uid, begin, end)
     logger.info(f'{uid} 获取推荐历史 history= {history}')
     j = {'status': 0, 'data': history}
