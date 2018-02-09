@@ -131,12 +131,12 @@ class Contents(models.Model):
 
     @classmethod
     def get_all_abmormal_cids(cls):
-        cids = cls.objects.exclude(status=0, is_secret=0, theme__status=0, theme__is_secret=0).values('id')
+        cids = cls.objects.exclude(status=0, is_secret=0, theme__status=0, theme__is_secret=0, user_id=0).values('id')
         return [c['id'] for c in cids]
 
     @classmethod
     def get_contentstr_list(cls, cid=None, nocids=None) -> Dict:
-        records = cls.objects.filter(status=0, theme__status=0)
+        records = cls.objects.filter(status=0, theme__status=0, user_id=0)
         if cid:
             records = records.filter(id=cid)
         if nocids:
@@ -157,7 +157,7 @@ class Contents(models.Model):
         recent = datetime.now() - timedelta(days=recent_days)
         if nocids is None:
             nocids = []
-        records = cls.objects.filter(status=0, is_secret=0, theme__status=0, theme__is_secret=0)
+        records = cls.objects.filter(status=0, is_secret=0, theme__status=0, theme__is_secret=0, user_id=0)
         records = records.exclude(id__in=nocids).filter(updated_at__gte=recent).order_by('-updated_at').values('id')[
                   :limit]
         cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
