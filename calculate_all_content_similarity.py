@@ -46,7 +46,7 @@ GET_ALL_CONTENTS_SQL = "select id,title, desp from contents where status=0 order
 PROCESS_COUNT = os.cpu_count() - 1
 # PROCESS_COUNT = 1
 print(f'PROCESS_COUNT={PROCESS_COUNT}')
-SIMI_MIN = 0.2
+SIMI_MIN = 0.5
 SIMI_MAX = 0.9
 CACHED_MAX_CID_KEY = 'cached_max_cid'
 time.sleep(2)
