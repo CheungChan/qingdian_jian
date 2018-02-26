@@ -208,10 +208,10 @@ CACHE_SECONDS = 5 * 60
 MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
 weight = {
-    'ContentBasedEngine': 0.4,
+    'ContentBasedEngine': 0.3,
     'TagBasedEngine': 0.3,
     'HotBasedEngine': 0.2,
-    'RecentBasedEngine': 0.1,
+    'RecentBasedEngine': 0.2,
 }
 LOG_BEGIN = '+' * 10
 LOG_END = '-' * 10
