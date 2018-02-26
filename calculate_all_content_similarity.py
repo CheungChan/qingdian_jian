@@ -23,6 +23,8 @@ userdict = os.path.join(pwd, 'userdict.txt')
 jieba.load_userdict(userdict)
 import jieba.analyse
 
+stop_words_path = os.path.join(pwd, 'stop_words.txt')
+jieba.analyse.set_stop_words(stop_words_path)
 default_test_db = test_db.get('default')
 test_db = {
     'db': 'qdbuluo',
