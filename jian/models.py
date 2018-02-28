@@ -162,3 +162,8 @@ class Contents(models.Model):
                   :limit]
         cid_sim_list = [(r.get('id'), 1 / limit) for r in records]
         return cid_sim_list
+
+    @classmethod
+    def get_pic_link_by_id(cls, cid):
+        content = cls.objects.filter(id=cid).values('pic_link')
+        return content[0]['pic_link'] if content else None

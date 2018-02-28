@@ -86,11 +86,20 @@ class Process:
         logger.info('过滤')
         # logger.info(f'过滤前self.rawdata={self.rawdata}')
         # 要过滤的cid
-        rawdata = []
+        filtered_rawdata = []
         for cid, sim, engine_name in self.rawdata:
             if cid not in self.fitering_cids:
-                rawdata.append((cid, sim, engine_name))
-        self.rawdata = rawdata
+                filtered_rawdata.append((cid, sim, engine_name))
+
+        # 对pic_link相同(有内容)的去重,pic_link为空算都是不重的.
+        pic_link_cid_dict = {}
+        no_pick_link_cid_list = []
+        for data in filtered_rawdata:
+            pic_link = models.Contents.get_pic_link_by_id(data[0])
+            if not pic_link:
+                no_pick_link_cid_list.append(data)
+            pic_link_cid_dict[pic_link] = data
+        self.rawdata = [v for v in pic_link_cid_dict.values()] + no_pick_link_cid_list
         # logger.info(f'过滤后self.rawdata={self.rawdata}')
 
     def order_data(self):
