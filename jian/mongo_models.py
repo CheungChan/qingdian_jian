@@ -168,6 +168,8 @@ class JianHistory:
         :param jian_cids:
         :return:
         """
+        if len(jian_cids) == 0:
+            return
         data = {'uid': uid, 'jids': jian_cids, 'analyze': analyze, 'update_time': datetime.now()}
         db = get_mongo_collection(cls.collection_name)
         db.insert_one(data)
