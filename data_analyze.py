@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from pprint import pprint
+from prettytable import PrettyTable
 
 import logzero
 
@@ -30,10 +30,13 @@ def get_mongo_record(from_datetime, end_datetime):
 
 
 if __name__ == '__main__':
-    from_datetime = datetime.now() - timedelta(days=1)
-    end_datetime = datetime.now()
-    # from_datetime = None
-    # end_datetime = None
+    if DEBUG:
+        from_datetime = None
+        end_datetime = None
+    else:
+        from_datetime = datetime.now() - timedelta(days=1)
+        end_datetime = datetime.now()
+
     jian_history, jian_track = get_mongo_record(from_datetime=from_datetime, end_datetime=end_datetime)
 
     records = []
@@ -45,4 +48,7 @@ if __name__ == '__main__':
         data = [uid, history_count, track_count, f'{track_count / history_count * 100}%']
         records.append(data)
     records.sort(key=lambda record: record[2], reverse=True)
-    pprint(records)
+    t = PrettyTable(['用户id', '推荐个数', '喜欢个数', '命中率'])
+    for r in records:
+        t.add_row(r)
+    print(t)
