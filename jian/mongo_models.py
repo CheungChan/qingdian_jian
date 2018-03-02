@@ -74,15 +74,19 @@ class JianTrack:
         logger.info(f'track data={data}')
 
     @classmethod
-    def statistics_rencent_tracked_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int):
+    def statistics_rencent_tracked_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int = None):
         """
         统计一定时间范围内的喜欢的内容id
         :param from_datetime:
         :param end_datetime:
+        :param client
         :return:
         """
         db = get_mongo_collection(cls.collection_name)
-        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if from_datetime and end_datetime:
+            condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        else:
+            condition = {}
         if client is not None:
             condition.update({'client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
@@ -149,7 +153,10 @@ class JianTrackDiss:
         :return:
         """
         db = get_mongo_collection(cls.collection_name)
-        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if from_datetime and end_datetime:
+            condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        else:
+            condition = {}
         if client is not None:
             condition.update({'client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
@@ -194,7 +201,7 @@ class JianHistory:
         return history
 
     @classmethod
-    def statistics_rencent_jianed_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int):
+    def statistics_rencent_jianed_docs(cls, from_datetime: datetime, end_datetime: datetime, client: int = None):
         """
         统计一定时间范围内的推荐历史
         :param from_datetime:
@@ -202,7 +209,10 @@ class JianHistory:
         :return:
         """
         db = get_mongo_collection(cls.collection_name)
-        condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        if from_datetime and end_datetime:
+            condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+        else:
+            condition = {}
         if client is not None:
             condition.update({'analyze.client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))

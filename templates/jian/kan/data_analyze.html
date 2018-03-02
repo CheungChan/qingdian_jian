@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>数据分析</title>
+    {% load staticfiles %}
+    <!-- Bootstrap -->
+    <link href="{% static "jian/kan/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        th {
+            cursor: pointer;
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+<table class="table table-condensed">
+    <tr>
+        <th></th>
+        <th onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=0'">用户id</th>
+        <th onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=1'">推荐个数</th>
+        <th onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=2'">点击个数</th>
+        <th onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=3'">命中概率(%)</th>
+    </tr>
+    {% for r in records %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            {% for i in r %}
+                <td>{{ i }}</td>{% endfor %}</tr>
+    {% endfor %}
+</table>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="{% static "jian/kan/bootstrap/js/bootstrap.min.js" %}"></script>
+</body>
+</html>

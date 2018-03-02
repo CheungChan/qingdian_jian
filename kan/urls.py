@@ -9,4 +9,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='kan_index'),
+    url(r'^data_analyze$', views.data_analyze, name='kan_data_analyze'),
 ]

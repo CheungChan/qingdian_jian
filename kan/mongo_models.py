@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class Statistics:
     @classmethod
     def get_data(cls, from_datetime, end_datetime, client: int):
-        jianed_docs = mongo_models.JianHistory.statistics_rencent_jianed_docs(from_datetime, end_datetime,client)
+        jianed_docs = mongo_models.JianHistory.statistics_rencent_jianed_docs(from_datetime, end_datetime, client)
         tracked_docs = mongo_models.JianTrack.statistics_rencent_tracked_docs(from_datetime, end_datetime, client)
         dissed_docs = mongo_models.JianTrackDiss.statistics_rencent_dissed_docs(from_datetime, end_datetime, client)
         jianed_cids = []
@@ -22,3 +22,14 @@ class Statistics:
         tracked_cids = filter_cids(d.get('cid', 0) for d in tracked_docs)
         dissed_cids = filter_cids(d.get('cid', 0) for d in dissed_docs)
         return jianed_cids, tracked_cids, dissed_cids
+
+    @classmethod
+    def data_analyze(cls, from_datetime, end_datetime):
+        jian_track = {}
+        jian_history = {}
+        for j in mongo_models.JianTrack.statistics_rencent_tracked_docs(from_datetime, end_datetime, None):
+            jian_track.setdefault(j['uid'], set()).add(j['cid'])
+        for j in mongo_models.JianHistory.statistics_rencent_jianed_docs(from_datetime, end_datetime, None):
+            for jid in j['jids']:
+                jian_history.setdefault(j['uid'], set()).add(jid)
+        return jian_history, jian_track
