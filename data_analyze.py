@@ -42,7 +42,7 @@ if __name__ == '__main__':
         history_count = len(jian_history.get(uid, []))
         if history_count == 0:
             continue
-        data = [uid, history_count, track_count, history_count / track_count]
+        data = [uid, history_count, track_count, f'{track_count / history_count * 100}%']
         records.append(data)
     records.sort(key=lambda record: record[2], reverse=True)
     pprint(records)
