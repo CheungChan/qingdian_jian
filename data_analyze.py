@@ -49,6 +49,10 @@ if __name__ == '__main__':
         records.append(data)
     records.sort(key=lambda record: record[2], reverse=True)
     t = PrettyTable(['用户id', '推荐个数', '喜欢个数', '命中率'])
+    t.align['用户id'] = 'l'
+    t.align['推荐个数'] = 'l'
+    t.align['喜欢个数'] = 'l'
+    t.align['命中率'] = 'r'
     for r in records:
         t.add_row(r)
     print(t)
