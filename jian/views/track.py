@@ -25,7 +25,7 @@ def track(request):
                   ('client', 0, int),
                   ('device_id', None, str),
                   ('behavior', 0, int),
-                  ('from_jian', 0, int), ]
+                  ('from_jian', 1, int), ]
     uid, cid, client, device_id, behavior, from_jian = type_cast_request_args(request, validaters)
     if any((x is None for x in [uid, cid, client, behavior, device_id, from_jian])):
         j = {'status': -1, 'msg': '参数传递非法'}
