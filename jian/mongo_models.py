@@ -62,14 +62,14 @@ class JianTrack:
         return cid_sim_list
 
     @classmethod
-    def store_track_cid(cls, uid: int, cid: int, client: int, behavior: int, device_id: str):
+    def store_track_cid(cls, uid: int, cid: int, client: int, behavior: int, device_id: str, from_jian: int):
         """
         保存埋点结果cid
         """
         tags = models.ContentsTag.get_tids_by_cid(cid)
         db = get_mongo_collection(cls.collection_name)
         data = {'uid': uid, 'cid': cid, 'tids': tags, 'update_time': datetime.now(), 'client': client,
-                'device_id': device_id, 'behavior': behavior}
+                'device_id': device_id, 'behavior': behavior, 'from_jian': from_jian}
         db.insert_one(data)
         logger.info(f'track data={data}')
 
@@ -84,9 +84,9 @@ class JianTrack:
         """
         db = get_mongo_collection(cls.collection_name)
         if from_datetime and end_datetime:
-            condition = {'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
+            condition = {'from_jian': 1, 'update_time': {'$gte': from_datetime, '$lte': end_datetime}}
         else:
-            condition = {}
+            condition = {'from_jian': 1}
         if client is not None:
             condition.update({'client': client})
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))

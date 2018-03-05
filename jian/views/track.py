@@ -24,12 +24,13 @@ def track(request):
                   ('cid', 0, int),
                   ('client', 0, int),
                   ('device_id', None, str),
-                  ('behavior', 0, int)]
-    uid, cid, client, device_id, behavior = type_cast_request_args(request, validaters)
-    if any((x is None for x in [uid, cid, client, behavior, device_id])):
+                  ('behavior', 0, int),
+                  ('from_jian', 0, int), ]
+    uid, cid, client, device_id, behavior, from_jian = type_cast_request_args(request, validaters)
+    if any((x is None for x in [uid, cid, client, behavior, device_id, from_jian])):
         j = {'status': -1, 'msg': '参数传递非法'}
         logger.error(j)
         return JsonResponse(j, safe=False)
-    mongo_models.JianTrack.store_track_cid(uid, cid, client, behavior, device_id)
+    mongo_models.JianTrack.store_track_cid(uid, cid, client, behavior, device_id, from_jian)
     j = {'status': 0, 'msg': 'ok'}
     return JsonResponse(j, safe=False)
