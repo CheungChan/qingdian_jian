@@ -210,8 +210,8 @@ MONGO_DATABASE = 'qingdian'
 weight = {
     'ContentBasedEngine': 0.3,
     'TagBasedEngine': 0.3,
-    'HotBasedEngine': 0.2,
-    'RecentBasedEngine': 0.2,
+    'HotBasedEngine': 0.3,
+    'RecentBasedEngine': 0.1,
 }
 LOG_BEGIN = '+' * 10
 LOG_END = '-' * 10
