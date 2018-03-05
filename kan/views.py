@@ -52,7 +52,7 @@ def data_analyze(request):
         if history_count == 0:
             continue
         user_name = models.User.get_username_by_uid(uid)
-        data = [user_name if user_name else '', history_count, track_count,
+        data = [f'{user_name}({uid})' if user_name else '', history_count, track_count,
                 round(track_count / history_count * 100, 2)]
         records.append(data)
     records.sort(key=lambda record: record[sort], reverse=True)
