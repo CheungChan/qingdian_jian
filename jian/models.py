@@ -167,3 +167,43 @@ class Contents(models.Model):
     def get_pic_link_by_id(cls, cid):
         content = cls.objects.filter(id=cid).values('pic_link')
         return content[0]['pic_link'] if content else None
+
+
+class User(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_type = models.IntegerField()
+    open_id = models.CharField(max_length=255)
+    user_name = models.CharField(max_length=255)
+    user_sina_url = models.CharField(max_length=255, blank=True, null=True)
+    user_portrait_url = models.CharField(max_length=255)
+    introduce = models.CharField(max_length=255)
+    gender = models.IntegerField(blank=True, null=True)
+    add_time = models.DateTimeField()
+    update_time = models.DateTimeField()
+    last_login_type = models.IntegerField(blank=True, null=True)
+    ip = models.CharField(max_length=40, blank=True, null=True)
+    user_status = models.IntegerField()
+    is_modifiy = models.IntegerField()
+    tel = models.CharField(max_length=32)
+    birthday = models.CharField(max_length=32)
+    password = models.CharField(max_length=32)
+    qq_openid = models.CharField(max_length=240)
+    wx_openid = models.CharField(max_length=240)
+    area_province = models.CharField(max_length=32)
+    area_city = models.CharField(max_length=32)
+    address = models.CharField(max_length=255)
+    invite_code = models.CharField(max_length=255)
+    reg_type = models.IntegerField()
+    game_level = models.IntegerField()
+    game_exp = models.IntegerField()
+    game_lightbean = models.IntegerField()
+    game_reward_type = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'user'
+
+    @classmethod
+    def get_username_by_uid(cls, uid):
+        user = cls.objects.filter(id=uid).values('user_name')
+        return user[0]['user_name'] if user else None

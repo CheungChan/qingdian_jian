@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, HttpResponse
 
 from kan import mongo_models
+from jian import models
 from qingdian_jian.utils import type_cast_request_args, log_views
 from qingdian_jian.settings import DEBUG
 
@@ -50,7 +51,9 @@ def data_analyze(request):
         history_count = len(jian_history.get(uid, []))
         if history_count == 0:
             continue
-        data = [uid, history_count, track_count, round(track_count / history_count * 100, 2)]
+        user_name = models.User.get_username_by_uid(uid)
+        data = [user_name if user_name else '', history_count, track_count,
+                round(track_count / history_count * 100, 2)]
         records.append(data)
     records.sort(key=lambda record: record[sort], reverse=True)
     return render(request, 'jian/kan/data_analyze.html', locals())
