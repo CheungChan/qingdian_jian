@@ -5,14 +5,14 @@ from datetime import datetime
 from functools import lru_cache
 from math import sqrt
 from multiprocessing import Pool
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import jieba
+import logzero
 import pymysql
 from logzero import logger
-import logzero
 
-from qingdian_jian.settings import DEBUG, test_db, prod_db
+from qingdian_jian.settings import DEBUG
 from qingdian_jian.utils import get_mongo_collection
 
 logfile = f"/tmp/{os.path.basename(__file__)}.log"
@@ -25,7 +25,6 @@ import jieba.analyse
 
 stop_words_path = os.path.join(pwd, 'stop_words.txt')
 jieba.analyse.set_stop_words(stop_words_path)
-default_test_db = test_db.get('default')
 test_db = {
     'db': 'qdbuluo',
     'host': '10.10.6.2',
@@ -33,7 +32,6 @@ test_db = {
     'password': '123-qwe',
     'charset': 'utf8mb4',
 }
-default_prod_db = prod_db.get('default')
 prod_db = {
     'db': 'qdbuluo',
     'host': '10.10.6.6',
