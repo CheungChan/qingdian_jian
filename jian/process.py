@@ -37,6 +37,7 @@ class Process:
         self.prepare_prepare_signature_vector()
         self.combile_engine_recommad()
         self.filter_data()
+        self.variaty_data()
         self.order_data()
         self.store_data()
 
@@ -99,15 +100,32 @@ class Process:
             if not pic_link:
                 no_pick_link_cid_list.append(data)
             pic_link_cid_dict[pic_link] = data
-        self.rawdata = [v for v in pic_link_cid_dict.values()] + no_pick_link_cid_list
+        self.rawdata = list(set([v for v in pic_link_cid_dict.values()] + no_pick_link_cid_list))
         # logger.info(f'过滤后self.rawdata={self.rawdata}')
+
+    def variaty_data(self):
+        """
+        为了维持推荐的多样性,同一主题在一次推荐下不要多于MAX_CID_PER_THEME个.
+        :return:
+        """
+        logger.info('多样性')
+        MAX_CID_PER_THEME = 2
+        theme_count = {}
+        new_rawdata = []
+        for cid, sim, engine_name in self.rawdata:
+            theme = models.Contents.get_theme_by_cid(cid)
+            theme_count.setdefault(theme, 0)
+            theme_count[theme] += 1
+            if theme_count[theme] <= MAX_CID_PER_THEME:
+                new_rawdata.append((cid, sim, engine_name))
+        self.rawdata = new_rawdata
 
     def order_data(self):
         logger.info('排序')
-        self.rawdata = list(set(self.rawdata))[:self.n]
+        self.rawdata = self.rawdata[:self.n]
         shuffle(self.rawdata)
         self.data = [d[0] for d in self.rawdata]
-        c = Counter(r[2] for r in self.rawdata)
+        c = Counter(d[2] for d in self.rawdata)
         # 推荐的引擎来源和个数
         self.analyze = {'rate': self.rawdata, 'every_count': c.most_common(), 'counts': len(self.rawdata),
                         'client': self.client, 'device_id': self.device_id}

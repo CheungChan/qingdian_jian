@@ -164,9 +164,14 @@ class Contents(models.Model):
         return cid_sim_list
 
     @classmethod
-    def get_pic_link_by_id(cls, cid):
+    def get_pic_link_by_id(cls, cid: int):
         content = cls.objects.filter(id=cid).values('pic_link')
         return content[0]['pic_link'] if content else None
+
+    @classmethod
+    def get_theme_by_cid(cls, cid: int):
+        content = cls.objects.filter(id=cid).values('theme')
+        return content[0]['theme'] if content else None
 
 
 class User(models.Model):
