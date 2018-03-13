@@ -113,7 +113,7 @@ class Process:
         :return:
         """
         logger.info('多样性')
-        MAX_CID_PER_THEME = 2
+        MAX_CID_PER_THEME = 3
         theme_count = {}
         new_rawdata = []
         for cid, sim, engine_name in self.rawdata:

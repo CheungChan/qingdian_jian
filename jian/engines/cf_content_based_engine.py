@@ -92,7 +92,7 @@ class CFContentBasedEngine(BaseEngine):
         # 建立字典,以给出与整合写物品最为相近的所有其他物品
         content_similarity = {}
         c = 0
-        for content in tqdm(content_user_grade):
+        for content in tqdm(content_user_grade, desc='calculate_content_similarity'):
             c += 1
             if c % 100 == 0: print(f'{c} / {len(content_user_grade)}')
             # 针对大数据集更新状态变量
