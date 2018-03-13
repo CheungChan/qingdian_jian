@@ -130,7 +130,12 @@ class Contents(models.Model):
         verbose_name_plural = verbose_name
 
     @classmethod
-    def get_all_abmormal_cids(cls):
+    def get_all_normal_cids(cls):
+        cids = cls.objects.filter(status=0, is_secret=0, theme__status=0, theme__is_secret=0, user_id=0).values('id')
+        return [c['id'] for c in cids]
+
+    @classmethod
+    def get_all_abnormal_cids(cls):
         cids = cls.objects.exclude(status=0, is_secret=0, theme__status=0, theme__is_secret=0, user_id=0).values('id')
         return [c['id'] for c in cids]
 
@@ -212,3 +217,8 @@ class User(models.Model):
     def get_username_by_uid(cls, uid):
         user = cls.objects.filter(id=uid).values('user_name')
         return user[0]['user_name'] if user else None
+
+    @classmethod
+    def get_all_userids(cls):
+        users = cls.objects.values('id')
+        return [u['id'] for u in users]

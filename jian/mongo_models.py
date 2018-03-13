@@ -34,7 +34,7 @@ class JianTrack:
         for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
             trackcids.append(t['cid'])
             tracktids += t['tids']
-        logger.debug(f'len_trackcid= {len(trackcids)}, len_tracktid= {len(tracktids)}')
+        # logger.debug(f'len_trackcid= {len(trackcids)}, len_tracktid= {len(tracktids)}')
         return trackcids, tracktids
 
     @classmethod

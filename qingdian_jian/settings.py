@@ -105,8 +105,20 @@ prod_db = {
         'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
+
+prod_readonly_db = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'qdbuluo',
+        'HOST': '10.10.6.6',
+        'PORT': 3306,
+        'USER': 'develop',
+        'PASSWORD': '123^%$-qwe',
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
 if DEBUG:
-    DATABASES = test_db
+    DATABASES = prod_readonly_db
 else:
     DATABASES = prod_db
 
@@ -216,6 +228,8 @@ CACHE_SECONDS = 5 * 60
 MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
 weight = {
+    'CFContentBasedEngine': 0,
+    'CFUserBasedEngine': 0,
     'ContentBasedEngine': 0.3,
     'TagBasedEngine': 0.3,
     'HotBasedEngine': 0.3,

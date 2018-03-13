@@ -13,6 +13,8 @@ from jian.engines.content_based_engine import ContentBasedEngine
 from jian.engines.hot_based_engine import HotBasedEngine
 from jian.engines.tag_based_engine import TagBasedEngine
 from jian.engines.recent_based_engine import RecentBasedEngine
+from jian.engines.cf_user_based_engine import CFUserBasedEngine
+from jian.engines.cf_content_based_engine import CFContentBasedEngine
 from qingdian_jian.settings import weight
 
 logger = logging.getLogger(__name__)
@@ -24,7 +26,9 @@ class Process:
     然后对推荐结果进行过滤，然后排序，最后存储推荐结果。
     此类是一个callable的类，调用可以获得推荐结果。
     """
-    engine_name_list = [c.__name__ for c in (ContentBasedEngine, TagBasedEngine, HotBasedEngine, RecentBasedEngine)]
+    engine_name_list = [c.__name__ for c in
+                        (ContentBasedEngine, TagBasedEngine, HotBasedEngine, RecentBasedEngine, CFUserBasedEngine,
+                         CFContentBasedEngine)]
 
     def __init__(self, uid, n, client, device_id):
         self.uid = uid
@@ -50,7 +54,7 @@ class Process:
         self.jianed_cids = mongo_models.JianHistory.get_jian_history(self.uid)
         # 应该过滤的内容id
         self.fitering_cids = list(
-            set(self.dissed_cids + self.jianed_cids + self.tracked_cids + models.Contents.get_all_abmormal_cids()))
+            set(self.dissed_cids + self.jianed_cids + self.tracked_cids + models.Contents.get_all_abnormal_cids()))
         self.len_tracked = len(self.tracked_cids)
         logger.debug(f'uid {self.uid} 找到cids个数 {self.len_tracked}')
 
@@ -78,9 +82,9 @@ class Process:
             len_new = len(newdata)
             lack = (task_count - len_new)
             if lack > 0:
-                logger.info(f'引擎得到数据缺少={lack}')
+                logger.info(f'引擎应得{task_count}个,实得{len_new}个,缺少={lack}个')
             if len_new > 0:
-                logger.info(f'{class_name}: {newdata}')
+                logger.info(f'{class_name}全部OK: {newdata}')
             self.rawdata += newdata
 
     def filter_data(self):
