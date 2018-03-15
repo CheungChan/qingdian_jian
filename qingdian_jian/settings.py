@@ -230,7 +230,7 @@ weight = {
     'CFContentBasedEngine': 0.3,
     'CFUserBasedEngine': 0,
     'ContentBasedEngine': 0.3,
-    'TagBasedEngine': 0.3,
+    'TagBasedEngine': 0,
     'HotBasedEngine': 0.3,
     'RecentBasedEngine': 0.1,
 }
