@@ -169,23 +169,17 @@ def cache_redis(redis_key: str, cache_seconds: int = None, json_dump=False):
 
 
 def jsonKeys2int(x: Dict[str, object], layer=1):
-    result = {}
     if layer == 1:
-        result = {int(k): v for k, v in x.items()}
+        return {int(k): v for k, v in x.items()}
     else:
-        for k, v in x.items():
-            result[int(k)] = jsonKeys2int(v, layer=layer - 1)
-    return result
+        return {int(k): jsonKeys2int(v, layer=layer - 1) for k, v in x.items()}
 
 
 def jsonKeys2str(x: Dict[str, object], layer=1):
-    result = {}
     if layer == 1:
-        result = {str(k): v for k, v in x.items()}
+        return {str(k): v for k, v in x.items()}
     else:
-        for k, v in x.items():
-            result[int(k)] = jsonKeys2str(v, layer=layer - 1)
-    return result
+        return {str(k): jsonKeys2str(x, layer=layer - 1) for k, v in x.items()}
 
 
 if __name__ == '__main__':
