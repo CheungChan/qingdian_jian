@@ -26,7 +26,7 @@ class CFContentBasedEngine(BaseEngine):
         :return:
         """
         user_content_grade = mongo_models.CollaborativeFiltering.get_user_content_grade()
-        logger.info(f'len(content_user)={len(user_content_grade)}')
+        logger.info(f'user_content_grade={user_content_grade}')
         content_similarity = mongo_models.CollaborativeFiltering.get_content_similarity()
         logger.info(f'len(content_similarity)={len(content_similarity)}')
         result = self.get_recommendations(user_content_grade, content_similarity)
