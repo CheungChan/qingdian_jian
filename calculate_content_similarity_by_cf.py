@@ -17,7 +17,7 @@ import django
 
 django.setup()
 from jian import models, mongo_models
-from qingdian_jian.settings import DEBUG
+from qingdian_jian.settings import DEBUG, GRADE_MAX
 
 logfile = f"/tmp/{os.path.basename(__file__)}.log"
 logzero.logfile(logfile, encoding='utf-8', maxBytes=500_0000, backupCount=3)
@@ -28,6 +28,7 @@ time.sleep(2)
 def get_content_user_grade() -> Dict[int, Dict[int, int]]:
     """
     得到内容 用户 评分的字典
+    评分最大值为GRADE_MAX
     :return:
     """
     all_cids = models.Contents.get_all_normal_cids()
@@ -39,6 +40,8 @@ def get_content_user_grade() -> Dict[int, Dict[int, int]]:
             if cid in all_cids:
                 content_user_grade.setdefault(cid, {}).setdefault(uid, 0)
                 content_user_grade[cid][uid] += 1
+                if content_user_grade[cid][uid] > GRADE_MAX:
+                    content_user_grade[cid][uid] = GRADE_MAX
     return content_user_grade
 
 

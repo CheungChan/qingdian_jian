@@ -7,6 +7,7 @@ import logging
 import time
 from datetime import datetime
 from functools import wraps
+from typing import Dict
 
 import pymongo
 import redis
@@ -167,12 +168,24 @@ def cache_redis(redis_key: str, cache_seconds: int = None, json_dump=False):
     return decorator
 
 
-def jsonKeys2int(x):
-    return {int(k): v for k, v in x.items()}
+def jsonKeys2int(x: Dict[str, object], layer=1):
+    result = {}
+    if layer == 1:
+        result = {int(k): v for k, v in x.items()}
+    else:
+        for k, v in x.items():
+            result[int(k)] = jsonKeys2int(v, layer=layer - 1)
+    return result
 
 
-def jsonKeys2str(x):
-    return {str(k): v for k, v in x.items()}
+def jsonKeys2str(x: Dict[str, object], layer=1):
+    result = {}
+    if layer == 1:
+        result = {str(k): v for k, v in x.items()}
+    else:
+        for k, v in x.items():
+            result[int(k)] = jsonKeys2str(v, layer=layer - 1)
+    return result
 
 
 if __name__ == '__main__':
@@ -181,12 +194,14 @@ if __name__ == '__main__':
     # mock_index(request)
     # r.set('azhang_test', 'value', ex=5 * 60)
     # print(r.get('azhang_test'))
-    db = get_mongo_collection("content_similarity_offline")
-    keys = [k.decode('utf-8') for k in r.keys('azhang_jian_simi_*')]
-    for k in keys:
-        v = r.get(k).decode('utf-8')
-        v = json.loads(v)
-        k = k.replace('azhang_jian_simi_', '')
-        data = {'cid': k, 'cid2_sim': v}
-        db.insert(data)
-        print(data)
+    # db = get_mongo_collection("content_similarity_offline")
+    # keys = [k.decode('utf-8') for k in r.keys('azhang_jian_simi_*')]
+    # for k in keys:
+    #     v = r.get(k).decode('utf-8')
+    #     v = json.loads(v)
+    #     k = k.replace('azhang_jian_simi_', '')
+    #     data = {'cid': k, 'cid2_sim': v}
+    #     db.insert(data)
+    #     print(data)
+    x = {'4': {'1': {'1': 3.14, '2': 34}, '2': {'4': 56}}}
+    print(jsonKeys2int(x, layer=3))

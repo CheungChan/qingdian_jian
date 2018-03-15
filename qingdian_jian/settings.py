@@ -236,4 +236,5 @@ weight = {
 }
 LOG_BEGIN = '+' * 10
 LOG_END = '-' * 10
-
+# 协同过滤最大评分值
+GRADE_MAX = 3

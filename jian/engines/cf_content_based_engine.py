@@ -7,7 +7,7 @@ import logging
 from typing import Dict, List, Tuple
 
 from jian.engines.base_engine import BaseEngine
-from qingdian_jian.utils import override, get_redis
+from qingdian_jian.utils import override, jsonKeys2int
 from jian import mongo_models
 
 logger = logging.getLogger(__name__)
@@ -25,10 +25,8 @@ class CFContentBasedEngine(BaseEngine):
         基于协同过滤进行推荐
         :return:
         """
-        user_content_grade = mongo_models.CollaborativeFiltering.get_user_content_grade()
-        logger.info(f'user_content_grade={user_content_grade}')
-        content_similarity = mongo_models.CollaborativeFiltering.get_content_similarity()
-        logger.info(f'len(content_similarity)={len(content_similarity)}')
+        user_content_grade = jsonKeys2int(mongo_models.CollaborativeFiltering.get_user_content_grade(), layer=2)
+        content_similarity = jsonKeys2int(mongo_models.CollaborativeFiltering.get_content_similarity())
         result = self.get_recommendations(user_content_grade, content_similarity)
         return result
 
@@ -55,14 +53,12 @@ class CFContentBasedEngine(BaseEngine):
                 # 全部相似度之和
                 total_sim.setdefault(content2, 0)
                 total_sim[content2] += similarity
-        logger.info(len(scores))
         # 过滤
         for cid in self.process.fitering_cids:
             scores.pop(cid, None)
-        logger.info(len(scores))
         # 排序
         # 将每个合计值除以加权和,求出平均值
-        result = [(content, score / total_sim[content]) for content, score in scores.items()]
+        result = [[content, score / total_sim[content]] for content, score in scores.items()]
 
         # 按照最高值到最低值排序,返回评分结果
         result: List[List[int, float]] = sorted(result,
