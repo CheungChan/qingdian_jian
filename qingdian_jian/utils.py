@@ -12,8 +12,8 @@ from typing import Dict
 import pymongo
 import redis
 from bson.objectid import ObjectId
-from logzero import logger
 
+logger = logging.getLogger(__name__)
 from qingdian_jian import settings
 
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
