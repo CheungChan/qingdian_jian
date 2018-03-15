@@ -5,18 +5,18 @@
 import logging
 from collections import Counter
 from datetime import datetime, timedelta
-from functools import lru_cache
 from typing import List, Dict, Tuple, Union
 
 import pymongo
 
 from jian import models
+from qingdian_jian.mongo_models import BaseMongoModel
 from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int
 
 logger = logging.getLogger(__name__)
 
 
-class JianTrack:
+class JianTrack(BaseMongoModel):
     collection_name = 'jian_track'
 
     # uid: xx cid: xx tids: [xx,yy] update_time: xx
@@ -24,7 +24,7 @@ class JianTrack:
     @classmethod
     def get_trackcids_tracktids(cls, uid: int):
         """
-        获取track（喜欢）过的内容id和标签id
+        获取track（喜欢）过的内容id和标签id,不去重,去重请处理返回值.
         :param uid:
         :return:
         """
@@ -36,6 +36,19 @@ class JianTrack:
             tracktids += t['tids']
         # logger.debug(f'len_trackcid= {len(trackcids)}, len_tracktid= {len(tracktids)}')
         return trackcids, tracktids
+
+    @classmethod
+    def get_trackedcids(cls, uid: int):
+        """
+        获取track(喜欢)过的内容id,不去重,去重请处理返回值.
+        :param uid:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        trackcids = []
+        for t in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
+            trackcids.append(t['cid'])
+        return trackcids
 
     @classmethod
     def get_recently_hot_tracked(cls, recent_days: int = 7, limit: int = 20, nocids: List[int] = None):
@@ -92,7 +105,7 @@ class JianTrack:
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
-class JianTrackDiss:
+class JianTrackDiss(BaseMongoModel):
     collection_name = 'jian_track_diss'
 
     # uid:xx cid:xx tids:[xx,yy]
@@ -114,6 +127,21 @@ class JianTrackDiss:
             diss_tids += d['tids']
         # logger.debug(f'获取不喜欢记录len_diss_cids={len(diss_cids)}, len_diss_tids={len(diss_tids)}')
         return diss_cids, diss_tids
+
+    @classmethod
+    def get_track_disscids(cls, uid: int):
+        """
+        获取不喜欢的内容id,不去重,如果去重,请处理返回值.
+        :param uid:
+        :return:
+        """
+        db = get_mongo_collection(cls.collection_name)
+        diss_cids = []
+        for d in db.find({'uid': uid}).sort('update_time', pymongo.DESCENDING):
+            cid = d.get('cid')
+            if cid:
+                diss_cids.append(cid)
+        return diss_cids
 
     @classmethod
     def store_diss_cid(cls, uid: int, cid: int, client: int, device_id: str):
@@ -162,7 +190,7 @@ class JianTrackDiss:
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
-class JianHistory:
+class JianHistory(BaseMongoModel):
     collection_name = 'jian_history'
 
     # uid:xx jian_cids:xx analyze:xx
@@ -218,12 +246,11 @@ class JianHistory:
         return list(db.find(condition).sort('update_time', pymongo.DESCENDING))
 
 
-class SimilarityOfContent:
+class SimilarityOfContent(BaseMongoModel):
     collection_name = 'similarity_of_content'
 
     # cid:xxx cid2_sim:[[1,0.1],[2,0.3],..]
     @classmethod
-    @lru_cache(None)
     def get_cached_similarity_by_cid(cls, cid) -> Tuple[List[Union[int, float]], int]:
         db = get_mongo_collection(cls.collection_name)
         cached_value = db.find_one({'cid': cid})
@@ -233,7 +260,7 @@ class SimilarityOfContent:
             return [], 0
 
 
-class UserContentSimilarityCache:
+class UserContentSimilarityCache(BaseMongoModel):
     collection_name = 'user_content_similarity_cache'
 
     @classmethod
@@ -270,3 +297,38 @@ class UserContentSimilarityCache:
                 cached_value['kcid_vtuplesumsimi0_countsimi1_dict'])
         else:
             return {}, {}
+
+
+class CollaborativeFiltering(BaseMongoModel):
+    collection_name = 'collaborative_filtring'
+    single_structure = False
+
+    @classmethod
+    def set_content_user_grade(cls, content_user_grade):
+        cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_user_grade',
+                             value=content_user_grade, json_dump=True)
+
+    @classmethod
+    def get_content_user_grade(cls):
+        return cls.get_multi_record(db=get_mongo_collection(cls.collection_name), name='content_user_grade',
+                                    json_dump=True)
+
+    @classmethod
+    def set_user_content_grade(cls, user_content_grade):
+        cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='user_content_grade',
+                             value=user_content_grade, json_dump=True)
+
+    @classmethod
+    def get_user_content_grade(cls):
+        return cls.get_multi_record(db=get_mongo_collection(cls.collection_name), name='user_content_grade',
+                                    json_dump=True)
+
+    @classmethod
+    def set_content_similarity(cls, content_similarity):
+        cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
+                             value=content_similarity, json_dump=True)
+
+    @classmethod
+    def get_content_similarity(cls):
+        return cls.get_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
+                                    json_dump=True)

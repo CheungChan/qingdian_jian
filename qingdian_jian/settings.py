@@ -33,7 +33,7 @@ if os.path.exists(profile_file):
     with open(profile_file) as f:
         if f.read().strip() == 'dev':
             DEBUG = True
-print(f'DEBUG={DEBUG}')
+print(f'settings DEBUG={DEBUG}')
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -223,12 +223,11 @@ else:
     RABBITMQ_USER = 'hgz'
     RABBITMQ_PASSWORD = 'hgz123^%$'
 REDIS_DB = 15
-CACHE_SECONDS = 5 * 60
 # MONGO_PORT = 27017
 MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
 weight = {
-    'CFContentBasedEngine': 0,
+    'CFContentBasedEngine': 0.3,
     'CFUserBasedEngine': 0,
     'ContentBasedEngine': 0.3,
     'TagBasedEngine': 0.3,
@@ -237,3 +236,4 @@ weight = {
 }
 LOG_BEGIN = '+' * 10
 LOG_END = '-' * 10
+

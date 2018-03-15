@@ -11,10 +11,10 @@ from functools import wraps
 import pymongo
 import redis
 from bson.objectid import ObjectId
+from logzero import logger
 
 from qingdian_jian import settings
 
-logger = logging.getLogger(__name__)
 pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 r = None
 global_connection = None
@@ -136,30 +136,35 @@ def mock_index(request):
     return 'hello world'
 
 
-def cache_redis(name, value_func: callable = None, retrive_value_func: callable = None, cache_seconds: int = None):
+def cache_redis(redis_key: str, cache_seconds: int = None, json_dump=False):
     """
-    缓存到redis或者从redis中取值
-    :param name:
-    :param value_func: 如果为None,则只get,如果为无参数函数,返回值作为要set的value
-    :param retrive_value_func: 函数用于转换redis返回的值,如果为None,不转换.
-    :param cache_seconds: 要缓存的秒数.如果为None,永久缓存.
+    缓存到redis
+    :param redis_key:
+    :param cache_seconds:
+    :param json_dump: 如果结果需要json.dumps,则设为True
     :return:
     """
-    cache = get_redis().get(name)
-    if cache:
-        logger.debug(f"{name}使用redis缓存")
-        value = cache.decode('utf-8')
-        if retrive_value_func is None:
-            return value
-        return retrive_value_func(value)
-    else:
-        if value_func is None:
-            if retrive_value_func is None:
-                return None
-            return retrive_value_func(None)
-        value = value_func()
-        get_redis().set(name, value, ex=cache_seconds)
-        return value
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            value = get_redis().get(redis_key)
+            if value:
+                logger.debug(f'从缓存中取出{redis_key}')
+                if json_dump:
+                    return json.loads(value.decode('utf-8'))
+                else:
+                    return value.decode('utf-8')
+            result = func(*args, **kwargs)
+            if json_dump:
+                value = json.dumps(result)
+            logger.debug(f'设置缓存{redis_key}')
+            get_redis().set(redis_key, value, ex=cache_seconds)
+            return result
+
+        return wrapper
+
+    return decorator
 
 
 def jsonKeys2int(x):

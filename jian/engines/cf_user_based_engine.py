@@ -42,8 +42,8 @@ class CFUserBasedEngine(BaseEngine):
         all_uids = models.User.get_all_userids()
         user_content_grade = {uid: {cid: 0 for cid in all_cids} for uid in all_uids}
         for uid in all_uids:
-            tracked_cids, _ = mongo_models.JianTrack.get_trackcids_tracktids(uid)
-            dissed_cids, _ = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(uid)
+            tracked_cids = mongo_models.JianTrack.get_trackedcids(uid)
+            dissed_cids = mongo_models.JianTrackDiss.get_track_disscids(uid)
             for cid in tracked_cids:
                 if uid in user_content_grade and cid in user_content_grade[uid]:
                     user_content_grade[uid][cid] += 1

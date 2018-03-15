@@ -68,12 +68,11 @@ def diss_list(request):
         j = {'status': -1, 'data': []}
         logger.error(j)
         return JsonResponse(j, safe=False)
-    records = mongo_models.JianTrackDiss.get_track_disscids_diss_tids(uid)[0]
+    records = mongo_models.JianTrackDiss.get_track_disscids(uid)
     records = list(set(records))
     j = {'status': 0, 'data': records}
     logger.info(f'diss_list j={j}')
     return JsonResponse(j, safe=False)
-
 
 @log_views
 def diss_theme_list(request):
