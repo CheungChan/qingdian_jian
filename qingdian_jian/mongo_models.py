@@ -23,10 +23,11 @@ class BaseMongoModel:
         :param value:
         :return:
         """
-        logger.debug(f'存入缓存 {name}')
-        if json_dump: value = json.dumps(value)
+        if json_dump:
+            value = json.dumps(value)
         data = {'name': name, 'value': value}
         db.update({'name': name}, data, upsert=True)
+        logger.debug(f'存入缓存 {name}')
 
     @staticmethod
     def get_multi_record(db, name, json_dump=False):
@@ -36,8 +37,8 @@ class BaseMongoModel:
         :param name:
         :return:
         """
-        logger.debug(f'取出缓存 {name}')
-        value = db.find_one({'name': name}, projection={'value': True, '_id': False}).get('value')
+        value = db.find_one({'name': name}, projection={'value': True, '_id': False}).get('value', {})
         if json_dump:
             value = json.loads(value)
+        logger.debug(f'取出缓存 {name}')
         return value
