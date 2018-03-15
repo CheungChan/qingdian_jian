@@ -7,7 +7,7 @@ import logging
 from typing import Dict, List, Tuple
 
 from jian.engines.base_engine import BaseEngine
-from qingdian_jian.utils import override, jsonKeys2int
+from qingdian_jian.utils import override
 from jian import mongo_models
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,8 @@ class CFContentBasedEngine(BaseEngine):
         基于协同过滤进行推荐
         :return:
         """
-        user_content_grade = jsonKeys2int(mongo_models.CollaborativeFiltering.get_user_content_grade(), layer=2)
-        content_similarity = jsonKeys2int(mongo_models.CollaborativeFiltering.get_content_similarity())
+        user_content_grade = mongo_models.CollaborativeFiltering.get_user_content_grade()
+        content_similarity = mongo_models.CollaborativeFiltering.get_content_similarity()
         result = self.get_recommendations(user_content_grade, content_similarity)
         return result
 
