@@ -209,7 +209,7 @@ def jsonKeys2str(x: Dict[str, object], layer=1):
     if layer == 1:
         return {str(k): v for k, v in x.items()}
     else:
-        return {str(k): jsonKeys2str(x, layer=layer - 1) for k, v in x.items()}
+        return {str(k): jsonKeys2str(v, layer=layer - 1) for k, v in x.items()}
 
 
 if __name__ == '__main__':
