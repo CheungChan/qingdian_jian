@@ -7,7 +7,6 @@ from collections import Counter
 from datetime import datetime, timedelta
 from typing import List, Dict, Tuple, Union
 import pymongo
-from functools import lru_cache
 from jian import models
 from qingdian_jian.mongo_models import BaseMongoModel
 from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int, cache_memory
@@ -250,7 +249,7 @@ class SimilarityOfContent(BaseMongoModel):
 
     # cid:xxx cid2_sim:[[1,0.1],[2,0.3],..]
     @classmethod
-    @lru_cache(None)
+    @cache_memory(key='similarity_by_cid', cache_seconds=60 * 30)
     def get_cached_similarity_by_cid(cls, cid) -> Tuple[List[Union[int, float]], int]:
         db = get_mongo_collection(cls.collection_name)
         cached_value = db.find_one({'cid': cid})

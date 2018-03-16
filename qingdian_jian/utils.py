@@ -184,7 +184,11 @@ def cache_memory(key: str, cache_seconds: int = None):
             now = datetime.now().timestamp()
             cache_time = _memory_cache_time_dict.get(key)
             value = _memory_cache_dict.get(key)
-            if value and now - cache_time <= cache_seconds:
+            if cache_seconds:
+                condition = value and now - cache_time <= cache_seconds
+            else:
+                condition = value
+            if condition:
                 logger.debug(f'取出内存缓存{key}')
                 return value
             result = func(*args, **kwargs)
