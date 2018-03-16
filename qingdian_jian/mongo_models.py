@@ -27,7 +27,7 @@ class BaseMongoModel:
             value = json.dumps(value)
         data = {'name': name, 'value': value}
         db.update({'name': name}, data, upsert=True)
-        logger.debug(f'存入缓存 {name}')
+        logger.debug(f'存入mongo缓存 {name}')
 
     @staticmethod
     def get_multi_record(db, name, json_dump=False):
@@ -40,5 +40,5 @@ class BaseMongoModel:
         value = db.find_one({'name': name}, projection={'value': True, '_id': False}).get('value', {})
         if json_dump:
             value = json.loads(value)
-        logger.debug(f'取出缓存 {name}')
+        logger.debug(f'取出mongo缓存 {name}')
         return value

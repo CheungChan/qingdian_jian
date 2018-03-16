@@ -10,7 +10,7 @@ import pymongo
 from functools import lru_cache
 from jian import models
 from qingdian_jian.mongo_models import BaseMongoModel
-from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int,cache_redis
+from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int, cache_memory
 
 logger = logging.getLogger(__name__)
 
@@ -319,6 +319,7 @@ class CollaborativeFiltering(BaseMongoModel):
                              value=user_content_grade, json_dump=True)
 
     @classmethod
+    @cache_memory(key='user_content_grade', cache_seconds=60 * 30)
     def get_user_content_grade(cls):
         return jsonKeys2int(
             cls.get_multi_record(db=get_mongo_collection(cls.collection_name), name='user_content_grade',
@@ -330,6 +331,7 @@ class CollaborativeFiltering(BaseMongoModel):
                              value=content_similarity, json_dump=True)
 
     @classmethod
+    @cache_memory(key='content_similarity', cache_seconds=60 * 30)
     def get_content_similarity(cls):
         return jsonKeys2int(
             cls.get_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',

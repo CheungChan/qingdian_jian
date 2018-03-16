@@ -21,6 +21,8 @@ r = None
 global_connection = None
 # 无效的cid
 no_cids = [None, 0, 1]
+_memory_cache_dict = {}
+_memory_cache_time_dict = {}
 
 
 def get_redis():
@@ -151,7 +153,7 @@ def cache_redis(redis_key: str, cache_seconds: int = None, json_dump=False):
         def wrapper(*args, **kwargs):
             value = get_redis().get(redis_key)
             if value:
-                logger.debug(f'从缓存中取出{redis_key}')
+                logger.debug(f'取出redis缓存{redis_key}')
                 if json_dump:
                     return json.loads(value.decode('utf-8'))
                 else:
@@ -159,8 +161,36 @@ def cache_redis(redis_key: str, cache_seconds: int = None, json_dump=False):
             result = func(*args, **kwargs)
             if json_dump:
                 value = json.dumps(result)
-            logger.debug(f'设置缓存{redis_key}')
+            logger.debug(f'存入redis缓存{redis_key}')
             get_redis().set(redis_key, value, ex=cache_seconds)
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+def cache_memory(key: str, cache_seconds: int = None):
+    """
+    缓存到内存中
+    :param key:
+    :param cache_seconds:
+    :return:
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            now = datetime.now().timestamp()
+            cache_time = _memory_cache_time_dict.get(key)
+            value = _memory_cache_dict.get(key)
+            if value and now - cache_time <= cache_seconds:
+                logger.debug(f'取出内存缓存{key}')
+                return value
+            result = func(*args, **kwargs)
+            logger.debug(f'存入内存缓存{key}')
+            _memory_cache_dict[key] = result
+            _memory_cache_time_dict[key] = now
             return result
 
         return wrapper
