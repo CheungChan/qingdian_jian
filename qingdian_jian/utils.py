@@ -189,7 +189,7 @@ def cache_memory(key: str, cache_seconds: int = None):
             else:
                 condition = value
             if condition:
-                logger.debug(f'取出内存缓存{key}')
+                # logger.debug(f'取出内存缓存{key}')
                 return value
             result = func(*args, **kwargs)
             logger.debug(f'存入内存缓存{key}')
