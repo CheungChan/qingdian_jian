@@ -23,7 +23,7 @@
         <th>用户名</th>
         <th class="sort" onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=1'">推荐个数</th>
         <th class="sort" onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=2'">点击个数</th>
-        <th class="sort" onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=3'">命中概率(%)</th>
+        <th class="sort" onclick="window.location.href='{% url 'kan_data_analyze' %}?sort=3'">CTR(%)</th>
     </tr>
     {% for r in records %}
         <tr>
