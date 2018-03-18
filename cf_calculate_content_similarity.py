@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 import time
@@ -21,7 +20,7 @@ from qingdian_jian.settings import DEBUG, GRADE_MAX
 
 logfile = f"/tmp/{os.path.basename(__file__)}.log"
 logzero.logfile(logfile, encoding='utf-8', maxBytes=500_0000, backupCount=3)
-print(f'脚本 DEBUG={DEBUG}')
+logger.info(f'脚本 DEBUG={DEBUG}')
 time.sleep(2)
 
 
