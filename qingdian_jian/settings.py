@@ -227,11 +227,11 @@ REDIS_DB = 15
 MONGO_PORT = 3000
 MONGO_DATABASE = 'qingdian'
 weight = {
-    'CFContentBasedEngine': 0.3,
+    'CFContentBasedEngine': 0.4,
     'CFUserBasedEngine': 0,
-    'ContentBasedEngine': 0.3,
+    'ContentBasedEngine': 0.4,
     'TagBasedEngine': 0,
-    'HotBasedEngine': 0.3,
+    'HotBasedEngine': 0.1,
     'RecentBasedEngine': 0.1,
 }
 LOG_BEGIN = '+' * 10
