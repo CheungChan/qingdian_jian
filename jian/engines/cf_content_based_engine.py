@@ -41,14 +41,11 @@ class CFContentBasedEngine(BaseEngine):
         # 循环遍历由当前用户评分的商品
         for content, rating in user_ratings.items():
 
-            # logger.debug(content)
-            # logger.debug(rating)
-            # 循环遍历与当前物品相近的物品
+            # 由于content_similarity是离线计算的,有延时性,所以有可能里面没有content.
             if content not in content_similarity:
                 continue
+            # 循环遍历与当前物品相近的物品
             for similarity, content2 in content_similarity[content]:
-                # logger.debug(similarity)
-                # logger.debug(content2)
 
                 # 如果用户已经对当前商品做过评价,则将其忽略
                 if content2 in user_ratings: continue
@@ -60,12 +57,9 @@ class CFContentBasedEngine(BaseEngine):
                 # 全部相似度之和
                 total_sim.setdefault(content2, 0)
                 total_sim[content2] += similarity
-                # logger.debug(len(total_sim))
-        logger.debug(f'len(scores)={len(scores)}')
         # 过滤
         for cid in self.process.fitering_cids:
             scores.pop(cid, None)
-        logger.debug(f'len(scores)={len(scores)}')
         # 排序
         # 将每个合计值除以加权和,求出平均值
         result = [[content, score / total_sim[content]] for content, score in scores.items()]
