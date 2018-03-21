@@ -57,6 +57,7 @@ class CFContentBasedEngine(BaseEngine):
                 # 全部相似度之和
                 total_sim.setdefault(content2, 0)
                 total_sim[content2] += similarity
+                logger.debug(len(total_sim))
         logger.debug(f'len(scores)={len(scores)}')
         # 过滤
         for cid in self.process.fitering_cids:
