@@ -44,6 +44,8 @@ class CFContentBasedEngine(BaseEngine):
             # logger.debug(content)
             # logger.debug(rating)
             # 循环遍历与当前物品相近的物品
+            if content not in content_similarity:
+                continue
             for similarity, content2 in content_similarity[content]:
                 # logger.debug(similarity)
                 # logger.debug(content2)
