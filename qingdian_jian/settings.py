@@ -98,7 +98,7 @@ prod_db = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'qdbuluo',
-        'HOST': '10.10.10.2',
+        'HOST': '10.10.10.43',
         'PORT': 2000,
         'USER': 'qd',
         'PASSWORD': '123^%$-qwe-asd',
