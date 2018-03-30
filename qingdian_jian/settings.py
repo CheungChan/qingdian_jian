@@ -97,7 +97,7 @@ test_db = {
 prod_db = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'qdbuluo',
+        'NAME': 'lt',
         'HOST': '10.10.10.43',
         'PORT': 2000,
         'USER': 'qd',
@@ -109,7 +109,7 @@ prod_db = {
 prod_readonly_db = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'qdbuluo',
+        'NAME': 'lt',
         'HOST': '10.10.6.6',
         'PORT': 3306,
         'USER': 'develop',
