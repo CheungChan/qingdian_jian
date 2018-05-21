@@ -6,12 +6,21 @@ import logging
 from collections import Counter
 from datetime import datetime, timedelta
 from typing import List, Dict, Tuple, Union
+from itertools import islice
+
 import pymongo
+
 from jian import models
 from qingdian_jian.mongo_models import BaseMongoModel
 from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int, cache_memory
 
 logger = logging.getLogger(__name__)
+
+
+def chunks(data, SIZE=10000):
+    it = iter(data)
+    for i in range(0, len(data), SIZE):
+        yield {k: data[k] for k in islice(it, SIZE)}
 
 
 class JianTrack(BaseMongoModel):
@@ -326,10 +335,14 @@ class CollaborativeFiltering(BaseMongoModel):
 
     @classmethod
     def set_content_similarity(cls, content_similarity):
-        if len(content_similarity) > 1000:
+        if len(content_similarity) > 100:
             logger.info(len(content_similarity))
-        cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
-                             value=content_similarity, json_dump=True)
+            for item in chunks(content_similarity, SIZE=100):
+                cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
+                                     value=item, json_dump=True)
+        else:
+            cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
+                                 value=content_similarity, json_dump=True)
 
     @classmethod
     @cache_memory(key='content_similarity', cache_seconds=60 * 30)
