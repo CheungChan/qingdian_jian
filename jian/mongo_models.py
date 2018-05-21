@@ -326,6 +326,8 @@ class CollaborativeFiltering(BaseMongoModel):
 
     @classmethod
     def set_content_similarity(cls, content_similarity):
+        if len(content_similarity) > 1000:
+            logger.info(len(content_similarity))
         cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
                              value=content_similarity, json_dump=True)
 
