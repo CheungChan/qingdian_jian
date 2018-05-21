@@ -17,7 +17,7 @@ from qingdian_jian.utils import get_mongo_collection, jsonKeys2str, jsonKeys2int
 logger = logging.getLogger(__name__)
 
 
-def chunks(data, SIZE=10000):
+def chunks(data, SIZE=100):
     it = iter(data)
     for i in range(0, len(data), SIZE):
         yield {k: data[k] for k in islice(it, SIZE)}
@@ -335,9 +335,10 @@ class CollaborativeFiltering(BaseMongoModel):
 
     @classmethod
     def set_content_similarity(cls, content_similarity):
-        if len(content_similarity) > 100:
+        THUNKS_NUM = 100
+        if len(content_similarity) > THUNKS_NUM:
             logger.info(len(content_similarity))
-            for item in chunks(content_similarity, SIZE=100):
+            for item in chunks(content_similarity, SIZE=THUNKS_NUM):
                 cls.set_multi_record(db=get_mongo_collection(cls.collection_name), name='content_similarity',
                                      value=item, json_dump=True)
         else:
