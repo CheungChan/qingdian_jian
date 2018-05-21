@@ -335,7 +335,7 @@ class CollaborativeFiltering(BaseMongoModel):
 
     @classmethod
     def set_content_similarity(cls, content_similarity):
-        THUNKS_NUM = 100
+        THUNKS_NUM = 1000
         if len(content_similarity) > THUNKS_NUM:
             logger.info(len(content_similarity))
             for item in chunks(content_similarity, SIZE=THUNKS_NUM):
