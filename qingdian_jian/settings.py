@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'jian',
     'kan',
+    'raven.contrib.django.raven_compat',
 ]
 
 MIDDLEWARE = [
@@ -238,3 +239,13 @@ LOG_BEGIN = '+' * 10
 LOG_END = '-' * 10
 # 协同过滤最大评分值
 GRADE_MAX = 3
+
+import os
+import raven
+
+RAVEN_CONFIG = {
+    'dsn': 'http://81e48e54d2d840f889ba75c773f6fcfe:23c77228e8d945a5aed16ab025862240@jian.sentry.cheungchan.cc//4',
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    # 'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
+}
